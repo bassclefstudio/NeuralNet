@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.30128.74
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Decklan.ML.Core", "Decklan.ML.Core\Decklan.ML.Core.csproj", "{503EEC31-4E07-4CC1-8055-F4993FA3D864}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{503EEC31-4E07-4CC1-8055-F4993FA3D864}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{503EEC31-4E07-4CC1-8055-F4993FA3D864}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{503EEC31-4E07-4CC1-8055-F4993FA3D864}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{503EEC31-4E07-4CC1-8055-F4993FA3D864}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {8DEF0E19-3F17-4108-B7B2-F2C3868B19DB}
+	EndGlobalSection
+EndGlobal
