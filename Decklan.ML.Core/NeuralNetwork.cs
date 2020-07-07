@@ -8,12 +8,25 @@ namespace Decklan.ML.Core
     {
         #region Properties
 
+        /// <summary>
+        /// An array of layer sizes, indicating the number of neurons per layer.
+        /// </summary>
         public int[] Layers { get; private set; }
+        
+        /// <summary>
+        /// A two-dimensional array of neuron activation values, with indexes [LayerId, NeuronId].
+        /// </summary>
         public double[][] Neurons { get; private set; }
-        public double[][] Biases { get; private set; }
-        public double[][][] Weights { get; private set; }
 
-        public double Fitness { get; } = 0;
+        /// <summary>
+        /// A two-dimensional array of neuron bias values, with indexes [LayerId, NeuronId].
+        /// </summary>
+        public double[][] Biases { get; private set; }
+
+        /// <summary>
+        /// A three-dimensional array of neuron connection weights, with indexes [LayerId, NeuronId, ConnectionId].
+        /// </summary>
+        public double[][][] Weights { get; private set; }
 
         #endregion
         #region Initialize
@@ -49,8 +62,8 @@ namespace Decklan.ML.Core
                 double[] bias = new double[Layers[i]];
                 for (int j = 0; j < Layers[i]; j++)
                 {
-                    //bias[j] = random.NextDouble() - 0.5;
-                    bias[j] = 0;
+                    bias[j] = random.NextDouble() - 0.5;
+                    //bias[j] = 0;
                 }
                 biasList.Add(bias);
             }
@@ -72,8 +85,8 @@ namespace Decklan.ML.Core
                     double[] neuronWeights = new double[neuronsInPreviousLayer];
                     for (int k = 0; k < neuronsInPreviousLayer; k++)
                     {
-                        //neuronWeights[k] = random.NextDouble() - 0.5;
-                        neuronWeights[k] = 1;
+                        neuronWeights[k] = random.NextDouble() - 0.5;
+                        //neuronWeights[k] = 1;
                     }
                     layerWeightsList.Add(neuronWeights);
                 }
@@ -85,9 +98,23 @@ namespace Decklan.ML.Core
         #endregion
         #region Evaluate
 
-        private double Activate(double value)
+        /// <summary>
+        /// Converts a value on the real number line non-linearly to a number between 0 and 1.
+        /// </summary>
+        /// <param name="value">The input <see cref="double"/>.</param>
+        public double Activate(double value)
         {
-            return Math.Tanh(value);
+            double k = (double)Math.Exp(value);
+            return k / (1.0f + k);
+        }
+
+        /// <summary>
+        /// The derivative of the <see cref="Activate(double)"/> function.
+        /// </summary>
+        /// <param name="value">The input <see cref="double"/>.</param>
+        public double ActivateDer(double value)
+        {
+            return value * (1 - value);
         }
 
         //feed forward, inputs => outputs.
