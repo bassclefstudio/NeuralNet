@@ -2,45 +2,54 @@
 using Decklan.ML.Core.Learning;
 using Decklan.ML.Core.Learning.Backpropagation;
 using System;
+using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
+using System.Transactions;
 
 namespace Decklan.ML.Client
 {
     class Program
     {
-        static SampleData[] SampleData;
+        static SampleSet SampleSet;
         static NeuralNetwork NeuralNetwork;
+
+        const double learningThreshold = 0.01;
+        const double lowValue = 0.2;
+        const double highValue = 0.8;
 
         static void Main(string[] args)
         {
-            SampleData = new SampleData[]
+            SampleSet = new SampleSet(new Tuple<SampleData, int>[]
             {
-                new SampleData(new double[]{ 0,0,0 }, new double[]{ 0,0,0 }),
-                new SampleData(new double[]{ 0,0,0 }, new double[]{ 0,0,0 }),
-                new SampleData(new double[]{ 1,1,0 }, new double[]{ 0,1,0 }),
-                new SampleData(new double[]{ 1,0,0 }, new double[]{ 1,0,0 }),
-                new SampleData(new double[]{ 1,0,1 }, new double[]{ 0,1,0 }),
-                new SampleData(new double[]{ 0,1,0 }, new double[]{ 1,0,0 }),
-                new SampleData(new double[]{ 0,1,1 }, new double[]{ 0,1,0 }),
-                new SampleData(new double[]{ 0,0,1 }, new double[]{ 1,0,0 }),
-                new SampleData(new double[]{ 1,1,1 }, new double[]{ 0,0,1 }),
-                new SampleData(new double[]{ 1,1,1 }, new double[]{ 0,0,1 })
-            };
+                new Tuple<SampleData, int>(new SampleData(new double[]{ 0,0,0 }, new double[]{ 0,0 }), 1),
+                new Tuple<SampleData, int>(new SampleData(new double[]{ 1,0,0 }, new double[]{ 0,1 }), 1),
+                new Tuple<SampleData, int>(new SampleData(new double[]{ 0,1,0 }, new double[]{ 0,1 }), 1),
+                new Tuple<SampleData, int>(new SampleData(new double[]{ 0,0,1 }, new double[]{ 0,1 }), 1),
+                new Tuple<SampleData, int>(new SampleData(new double[]{ 1,1,0 }, new double[]{ 1,0 }), 1),
+                new Tuple<SampleData, int>(new SampleData(new double[]{ 1,0,1 }, new double[]{ 1,0 }), 1),
+                new Tuple<SampleData, int>(new SampleData(new double[]{ 0,1,1 }, new double[]{ 1,0 }), 1),
+                new Tuple<SampleData, int>(new SampleData(new double[]{ 1,1,1 }, new double[]{ 1,1 }), 1)
+            });
 
-            NeuralNetwork = new NeuralNetwork(new int[] { 3, 6, 8, 3 });
+            NeuralNetwork = new NeuralNetwork(new int[] { 3, 6, 3, 2 });
 
-            ILearningAlgorithm learningAlgorithm = new BackpropagationLearningAlgorithm(1);
+            ILearningAlgorithm learningAlgorithm = new BackpropagationLearningAlgorithm(0.25);
             double cost = 1;
-            while (cost > 0.01)
+            Console.ForegroundColor = ConsoleColor.Gray;
+            var watch = System.Diagnostics.Stopwatch.StartNew();
+            while (cost > learningThreshold)
             {
-                for (int j = 0; j < 100; j++)
-                {
-                    cost = learningAlgorithm.Teach(NeuralNetwork, SampleData);
-                }
-                Console.WriteLine(cost);
+                cost = learningAlgorithm.Teach(NeuralNetwork, SampleSet, 100);
+                
+                Console.SetCursorPosition(0,0);
+                Console.Write($"{cost:F4} ");
+                GetProgress(cost);
+                Console.WriteLine();
             }
 
+            Console.ForegroundColor = ConsoleColor.Green;
+            Console.WriteLine($"Learning complete! Time elapsed - {watch.Elapsed:mm:ss}");
             Console.WriteLine();
 
             PrintMap();
@@ -52,9 +61,19 @@ namespace Decklan.ML.Client
             Console.ReadLine();
         }
 
+        public static void GetProgress(double cost)
+        {
+            double percent = 1 - cost + learningThreshold;
+            Console.Write($"({percent * 100:F1}%) [");
+            int left = Console.CursorLeft;
+            int size = Console.WindowWidth - left - 1;
+            Console.Write("".PadRight((int)(percent * size), '#').PadRight(size, '-'));
+            Console.Write("]");
+        }
+
         public static void EvaluateSamples()
         {
-            foreach (var sample in SampleData)
+            foreach (var sample in SampleSet.SampleData)
             {
                 var output = Evaluate(sample.Input);
                 Console.WriteLine($"Cost: {sample.GetCost(output):F4}");
@@ -63,25 +82,39 @@ namespace Decklan.ML.Client
 
         public static double[] Evaluate(double[] inputs)
         {
+            WriteArray(inputs);
+            Console.Write(" => ");
             var output = NeuralNetwork.FeedForward(inputs);
-            Console.ForegroundColor = ConsoleColor.Gray;
-            Console.Write($"[{string.Join(",", inputs)}] => [");
-            foreach (var o in output)
+            WriteArray(output);
+            Console.WriteLine();
+            return output;
+        }
+
+        public static void WriteArray(double[] array)
+        {
+            Console.Write("[");
+            for (int i = 0; i < array.Length; i++)
             {
-                if (output.Max() == o)
+                if (array[i] > highValue)
                 {
                     Console.ForegroundColor = ConsoleColor.Yellow;
+                }
+                else if (array[i] < lowValue)
+                {
+                    Console.ForegroundColor = ConsoleColor.Cyan;
                 }
                 else
                 {
                     Console.ForegroundColor = ConsoleColor.Gray;
                 }
-                Console.Write($"{o:F3},");
+                Console.Write($"{array[i]:F3}");
+                Console.ForegroundColor = ConsoleColor.Gray;
+                if (i < array.Length - 1)
+                {
+                    Console.Write(",");
+                }
             }
-            Console.ForegroundColor = ConsoleColor.Gray;
-            Console.WriteLine("]");
-            //Console.WriteLine($"[{string.Join(",", inputs)}] => [{string.Join(",", output.Select(o => o.ToString("F3")))}]");
-            return output;
+            Console.Write("]");
         }
 
         public static void PrintMap()

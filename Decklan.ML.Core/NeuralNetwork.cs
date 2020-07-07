@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Medallion;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
@@ -31,13 +32,13 @@ namespace Decklan.ML.Core
         #endregion
         #region Initialize
 
-        public NeuralNetwork(int[] layers)
+        public NeuralNetwork(int[] layers, double randMin = -1, double randMax = 1)
         {
             Layers = layers;
 
             InitNeurons();
-            InitBiases();
-            InitWeights();
+            InitBiases(randMin, randMax);
+            InitWeights(randMin, randMax);
         }
 
         //create empty storage array for the neurons in the network.
@@ -52,7 +53,7 @@ namespace Decklan.ML.Core
         }
 
         //initializes and populates array for the biases being held within the network.
-        private void InitBiases()
+        private void InitBiases(double randMin, double randMax)
         {
             var random = new Random();
 
@@ -62,8 +63,7 @@ namespace Decklan.ML.Core
                 double[] bias = new double[Layers[i]];
                 for (int j = 0; j < Layers[i]; j++)
                 {
-                    bias[j] = random.NextDouble() - 0.5;
-                    //bias[j] = 0;
+                    bias[j] = Rand.Current.NextDouble(randMin, randMax);
                 }
                 biasList.Add(bias);
             }
@@ -71,7 +71,7 @@ namespace Decklan.ML.Core
         }
 
         //initializes random array for the weights being held in the network.
-        private void InitWeights()
+        private void InitWeights(double randMin, double randMax)
         {
             var random = new Random();
 
@@ -85,8 +85,7 @@ namespace Decklan.ML.Core
                     double[] neuronWeights = new double[neuronsInPreviousLayer];
                     for (int k = 0; k < neuronsInPreviousLayer; k++)
                     {
-                        neuronWeights[k] = random.NextDouble() - 0.5;
-                        //neuronWeights[k] = 1;
+                        neuronWeights[k] = Rand.Current.NextDouble(randMin, randMax);
                     }
                     layerWeightsList.Add(neuronWeights);
                 }

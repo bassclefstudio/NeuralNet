@@ -36,5 +36,15 @@ namespace Decklan.ML.Core.Learning
 
             return costs.Sum() / costs.Count;
         }
+
+        /// <summary>
+        /// Passes a collection of <see cref="SampleData"/> objects to a given <see cref="NeuralNetwork"/> and adapts the parameters based on the <see cref="SampleData.ExpectedOutput"/>. Returns a <see cref="double"/> value indicating the average value of the <see cref="SampleData.GetCost(double[])"/> function of the network over each iteration.
+        /// </summary>
+        /// <param name="network">The <see cref="NeuralNetwork"/> to test and teach.</param>
+        /// <param name="data">The <see cref="SampleData"/> inputs and expected outputs to use for learning.</param>
+        public static double Teach(this ILearningAlgorithm algorithm, NeuralNetwork network, SampleSet data, int sampleSize)
+        {
+            return Teach(algorithm, network, data.GetSample(sampleSize));
+        }
     }
 }

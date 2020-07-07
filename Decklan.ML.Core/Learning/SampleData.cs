@@ -4,6 +4,9 @@ using System.Text;
 
 namespace Decklan.ML.Core.Learning
 {
+    /// <summary>
+    /// Represents an input/expected output pair that can be used for learning and testing purposes.
+    /// </summary>
     public class SampleData
     {
         /// <summary>

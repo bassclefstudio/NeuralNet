@@ -16,12 +16,19 @@ namespace Decklan.ML.Core.Learning.Backpropagation
         public double LearningRate { get; set; }
 
         /// <summary>
+        /// A <see cref="double"/> value indicating how much random change to the parameters should be made each time the <see cref="Teach(NeuralNetwork, SampleData)"/> method is called.
+        /// </summary>
+        public double Randomness { get; set; }
+
+        /// <summary>
         /// Creates a basic instance of the <see cref="BackpropagationLearningAlgorithm"/> from the given learning rate.
         /// </summary>
         /// <param name="learningRate">A <see cref="double"/> value indicating how much of a change to the parameters should be made each time the <see cref="Teach(NeuralNetwork, SampleData)"/> method is called.</param>
-        public BackpropagationLearningAlgorithm(double learningRate = 0.01)
+        /// <param name="randomness">A <see cref="double"/> value indicating how much random change to the parameters should be made each time the <see cref="Teach(NeuralNetwork, SampleData)"/> method is called.</param>
+        public BackpropagationLearningAlgorithm(double learningRate = 0.1, double randomness = 0)
         {
             LearningRate = learningRate;
+            Randomness = randomness;
         }
 
         /// <inheritdoc/>
