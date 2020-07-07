@@ -32,7 +32,7 @@ namespace Decklan.ML.Client
                 new Tuple<SampleData, int>(new SampleData(new double[]{ 1,1,1 }, new double[]{ 1,1 }), 1)
             });
 
-            NeuralNetwork = new NeuralNetwork(new int[] { 3, 6, 3, 2 });
+            NeuralNetwork = new NeuralNetwork(new int[] { 3, 6, 6, 2 });
 
             ILearningAlgorithm learningAlgorithm = new BackpropagationLearningAlgorithm(0.25);
             double cost = 1;
@@ -40,7 +40,7 @@ namespace Decklan.ML.Client
             var watch = System.Diagnostics.Stopwatch.StartNew();
             while (cost > learningThreshold)
             {
-                cost = learningAlgorithm.Teach(NeuralNetwork, SampleSet, 100);
+                cost = learningAlgorithm.Teach(NeuralNetwork, SampleSet, 200);
                 
                 Console.SetCursorPosition(0,0);
                 Console.Write($"{cost:F4} ");
@@ -49,7 +49,9 @@ namespace Decklan.ML.Client
             }
 
             Console.ForegroundColor = ConsoleColor.Green;
-            Console.WriteLine($"Learning complete! Time elapsed - {watch.Elapsed:mm:ss}");
+            Console.WriteLine($"Learning complete! Time elapsed - {watch.Elapsed.TotalSeconds} sec.");
+            watch.Stop();
+            Console.ForegroundColor = ConsoleColor.Gray;
             Console.WriteLine();
 
             PrintMap();
@@ -82,15 +84,15 @@ namespace Decklan.ML.Client
 
         public static double[] Evaluate(double[] inputs)
         {
-            WriteArray(inputs);
+            WriteArray(inputs, "F1");
             Console.Write(" => ");
             var output = NeuralNetwork.FeedForward(inputs);
-            WriteArray(output);
+            WriteArray(output, "F3");
             Console.WriteLine();
             return output;
         }
 
-        public static void WriteArray(double[] array)
+        public static void WriteArray(double[] array, string format)
         {
             Console.Write("[");
             for (int i = 0; i < array.Length; i++)
@@ -107,7 +109,7 @@ namespace Decklan.ML.Client
                 {
                     Console.ForegroundColor = ConsoleColor.Gray;
                 }
-                Console.Write($"{array[i]:F3}");
+                Console.Write($"{array[i].ToString(format)}");
                 Console.ForegroundColor = ConsoleColor.Gray;
                 if (i < array.Length - 1)
                 {

@@ -1,6 +1,8 @@
-﻿using System;
+﻿using Medallion;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Security.Cryptography;
 using System.Text;
 
 namespace Decklan.ML.Core.Learning.Backpropagation
@@ -62,6 +64,11 @@ namespace Decklan.ML.Core.Learning.Backpropagation
                 for (int j = 0; j < network.Layers[layer]; j++)
                 {
                     network.Weights[layer][i][j] -= gamma[network.Layers.Length - 1][i] * network.Neurons[layer][j] * LearningRate;
+                    //// Randomness:
+                    if (Randomness != 0)
+                    {
+                        network.Weights[layer][i][j] += Rand.Current.NextDouble(-Randomness, Randomness);
+                    }
                 }
             }
 
@@ -88,11 +95,23 @@ namespace Decklan.ML.Core.Learning.Backpropagation
                     //network.Biases[layer][j] -= gamma[i][j] * LearningRate;
                     network.Biases[i][j] -= gamma[i][j] * LearningRate;
 
+                    //// Randomness:
+                    if (Randomness != 0)
+                    {
+                        network.Biases[i][j] += Rand.Current.NextDouble(-Randomness, Randomness);
+                    }
+
                     //// Looking at current layer.
                     for (int k = 0; k < network.Layers[layer]; k++)
                     {
                         //// Change weights by -gamma.
                         network.Weights[layer][j][k] -= gamma[i][j] * network.Neurons[i - 1][k] * LearningRate;
+
+                        //// Randomness:
+                        if (Randomness != 0)
+                        {
+                            network.Weights[layer][j][k] += Rand.Current.NextDouble(-Randomness, Randomness);
+                        }
                     }
                 }
             }
