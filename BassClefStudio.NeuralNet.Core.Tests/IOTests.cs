@@ -12,7 +12,7 @@ namespace BassClefStudio.NeuralNet.Core.Tests
         public void CreateNetwork()
         {
             var network = new NeuralNetwork(new int[] { 2, 3, 2 });
-            using (var service = new JsonNeuralNetworkConverterService(Assembly.Load("BassClefStudio.NeuralNet.Core.IO")))
+            using (var service = new JsonNeuralNetworkConverterService())
             {
                 var json = service.WriteItem(network);
                 Console.WriteLine(json.ToString());

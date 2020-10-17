@@ -7,7 +7,7 @@ using System.Text;
 
 namespace BassClefStudio.NeuralNet.Core.IO
 {
-    public class NeuralNetworkToJsonConverter : IToJsonConverter<NeuralNetwork>
+    internal class NeuralNetworkToJsonConverter : IToJsonConverter<NeuralNetwork>
     {
         public bool CanConvert(NeuralNetwork item) => true;
 
@@ -21,7 +21,7 @@ namespace BassClefStudio.NeuralNet.Core.IO
         }
     }
 
-    public class NeuralNetworkFromJsonConverter : IFromJsonConverter<NeuralNetwork>
+    internal class NeuralNetworkFromJsonConverter : IFromJsonConverter<NeuralNetwork>
     {
         public bool CanConvert(JToken json) => json.IsJsonType("Network");
 

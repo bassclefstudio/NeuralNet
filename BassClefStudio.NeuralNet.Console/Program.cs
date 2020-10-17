@@ -3,12 +3,7 @@ using BassClefStudio.NeuralNet.Core.IO;
 using BassClefStudio.NeuralNet.Core.Learning;
 using BassClefStudio.NeuralNet.Core.Learning.Backpropagation;
 using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using System;
-using System.IO;
-using System.Linq;
-using System.Runtime.InteropServices;
-using System.Transactions;
 
 namespace BassClefStudio.NeuralNet.Client
 {
@@ -25,6 +20,7 @@ namespace BassClefStudio.NeuralNet.Client
 
         static void Main(string[] args)
         {
+            //// Test sample data - counting how many of the given data values were high (1) in binary in the output.
             SampleSet = new SampleSet(new Tuple<SampleData, int>[]
             {
                 new Tuple<SampleData, int>(new SampleData(new double[]{ 0,0,0 }, new double[]{ 0,0 }), 1),
