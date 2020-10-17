@@ -1,6 +1,9 @@
 ﻿using BassClefStudio.NeuralNet.Core;
+using BassClefStudio.NeuralNet.Core.IO;
 using BassClefStudio.NeuralNet.Core.Learning;
 using BassClefStudio.NeuralNet.Core.Learning.Backpropagation;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using System;
 using System.IO;
 using System.Linq;
@@ -102,6 +105,8 @@ namespace BassClefStudio.NeuralNet.Client
 
         public static void EvaluateSamples()
         {
+            Console.ForegroundColor = ConsoleColor.Cyan;
+            Console.WriteLine("Tests:");
             foreach (var sample in SampleSet.SampleData)
             {
                 var output = Evaluate(sample.Input);
@@ -148,18 +153,12 @@ namespace BassClefStudio.NeuralNet.Client
 
         public static void PrintMap()
         {
-            for (int l = 0; l < NeuralNetwork.Layers.Length; l++)
+            Console.ForegroundColor = ConsoleColor.Cyan;
+            Console.WriteLine("JSON:");
+            Console.ForegroundColor = ConsoleColor.Gray;
+            using (var convert = new JsonNeuralNetworkConverterService())
             {
-                Console.Write($"Layer {l}: ");
-                for (int i = 0; i < NeuralNetwork.Layers[l]; i++)
-                {
-                    Console.Write($"B{NeuralNetwork.Biases[l][i]:F2}: ");
-                    if (l > 0)
-                    {
-                        Console.Write($"[{string.Join(",", NeuralNetwork.Weights[l - 1][i].Select(w => w.ToString("F2")))}] ");
-                    }
-                }
-                Console.WriteLine();
+                Console.WriteLine(convert.WriteItem(NeuralNetwork).ToString(Formatting.None));
             }
         }
     }

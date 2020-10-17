@@ -12,7 +12,7 @@ namespace BassClefStudio.NeuralNet.Core.IO
 {
     public class JsonNeuralNetworkConverterService : ConverterService<NeuralNetwork, JToken, JToken>
     {
-        public JsonNeuralNetworkConverterService(params Assembly[] assemblies) : base(assemblies)
+        public JsonNeuralNetworkConverterService() : base(typeof(JsonNeuralNetworkConverterService).GetTypeInfo().Assembly)
         { }
 
         public override NeuralNetwork ReadItem(JToken input)
