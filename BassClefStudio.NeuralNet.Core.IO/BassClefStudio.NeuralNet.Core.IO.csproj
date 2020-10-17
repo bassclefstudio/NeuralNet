@@ -6,6 +6,8 @@
     <Version>0.0.1</Version>
     <Authors>BassClefStudio</Authors>
     <Description>File serialization services for BassClefStudio.NeuralNet.Core.</Description>
+    <PackageProjectUrl>https://github.com/bassclefstudio/NeuralNet</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/bassclefstudio/NeuralNet.git</RepositoryUrl>
   </PropertyGroup>
 
   <ItemGroup>
