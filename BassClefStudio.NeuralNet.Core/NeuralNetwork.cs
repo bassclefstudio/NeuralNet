@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace Decklan.ML.Core
+namespace BassClefStudio.NeuralNet.Core
 {
     public class NeuralNetwork
     {
@@ -32,6 +32,12 @@ namespace Decklan.ML.Core
         #endregion
         #region Initialize
 
+        /// <summary>
+        /// Creates a new, randomized <see cref="NeuralNetwork"/> with the given layer sizes.
+        /// </summary>
+        /// <param name="layers">An array of <see cref="int"/> sizes for each layer of the <see cref="NeuralNetwork"/>.</param>
+        /// <param name="randMin">The minimum random value for a weight or bias.</param>
+        /// <param name="randMax">The maximum random value for a weight or bias.</param>
         public NeuralNetwork(int[] layers, double randMin = -1, double randMax = 1)
         {
             Layers = layers;
@@ -39,6 +45,54 @@ namespace Decklan.ML.Core
             InitNeurons();
             InitBiases(randMin, randMax);
             InitWeights(randMin, randMax);
+        }
+
+        /// <summary>
+        /// Creates a <see cref="NeuralNetwork"/> from the given collection of layers, weights, and biases.
+        /// </summary>
+        /// <param name="layers">An array of <see cref="int"/> sizes for each layer of the <see cref="NeuralNetwork"/>.</param>
+        /// <param name="biases">An array of <see cref="double"/> arrays for each neuron in each layer.</param>
+        /// <param name="weights">An array of <see cref="double"/> arrays for each layer except the first with an array for each neuron, with each item representing the weight of the connection between that neuron and the n-th neuron in the previous layer. See <see cref="Weights"/>.</param>
+        public NeuralNetwork(int[] layers, double[][] biases, double[][][] weights)
+        {
+            if(biases.Length != layers.Length || weights.Length != layers.Length - 1)
+            {
+                throw new NetworkCreationException("The lengths of the weights and biases arrays must equal the number of layers.");
+            }
+            else
+            {
+                for (int i = 0; i < biases.Length; i++)
+                {
+                    if(biases[i].Length != layers[i])
+                    {
+                        throw new NetworkCreationException($"The length of the biases array for layer {i} must equal the value of Layers[{i}] ({layers[i]})");
+                    }
+                    
+                    if(i > 0)
+                    {
+                        if (weights[i - 1].Length != layers[i])
+                        {
+                            throw new NetworkCreationException($"The length of the weights array for layer {i - 1} must equal the value of Layers[{i - 1}] ({layers[i - 1]})");
+                        }
+                        else
+                        {
+                            for (int j = 0; j < weights[i - 1].Length; j++)
+                            {
+                                if (weights[i - 1][j].Length != layers[i - 1])
+                                {
+                                    throw new NetworkCreationException($"The length of each array in the weights for layer {i} must equal the value of Layers[{i - 1}] ({layers[i - 1]})");
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            Layers = layers;
+
+            InitNeurons();
+            Biases = biases;
+            Weights = weights;
         }
 
         //create empty storage array for the neurons in the network.
@@ -139,5 +193,12 @@ namespace Decklan.ML.Core
         }
 
         #endregion
+    }
+
+    public class NetworkCreationException : Exception
+    {
+        public NetworkCreationException() { }
+        public NetworkCreationException(string message) : base(message) { }
+        public NetworkCreationException(string message, Exception inner) : base(message, inner) { }
     }
 }

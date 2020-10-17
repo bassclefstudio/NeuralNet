@@ -16,7 +16,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Decklan.ML.Core\Decklan.ML.Core.csproj" />
+    <ProjectReference Include="..\BassClefStudio.NeuralNet.Core.IO\BassClefStudio.NeuralNet.Core.IO.csproj" />
+    <ProjectReference Include="..\BassClefStudio.NeuralNet.Core\BassClefStudio.NeuralNet.Core.csproj" />
   </ItemGroup>
 
 </Project>

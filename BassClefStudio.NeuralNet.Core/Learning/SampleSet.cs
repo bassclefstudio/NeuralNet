@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace Decklan.ML.Core.Learning
+namespace BassClefStudio.NeuralNet.Core.Learning
 {
     /// <summary>
     /// Represents a collection of <see cref="SampleData"/> objects for learning and testing purposes.

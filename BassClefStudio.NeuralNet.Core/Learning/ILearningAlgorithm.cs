@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace Decklan.ML.Core.Learning
+namespace BassClefStudio.NeuralNet.Core.Learning
 {
     /// <summary>
     /// Represents a service that can pass <see cref="SampleData"/> objects to a <see cref="NeuralNetwork"/> and adapt the parameters based on the output.

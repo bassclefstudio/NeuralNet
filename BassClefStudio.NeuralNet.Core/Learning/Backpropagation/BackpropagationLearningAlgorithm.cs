@@ -5,7 +5,7 @@ using System.Diagnostics;
 using System.Security.Cryptography;
 using System.Text;
 
-namespace Decklan.ML.Core.Learning.Backpropagation
+namespace BassClefStudio.NeuralNet.Core.Learning.Backpropagation
 {
     /// <summary>
     /// Represents a service that teaches a <see cref="NeuralNetwork"/> using backpropagation to adjust relevant parameters.

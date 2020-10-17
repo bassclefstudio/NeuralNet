@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace Decklan.ML.Core.Learning
+namespace BassClefStudio.NeuralNet.Core.Learning
 {
     /// <summary>
     /// Represents an input/expected output pair that can be used for learning and testing purposes.

@@ -1,13 +1,13 @@
-﻿using Decklan.ML.Core;
-using Decklan.ML.Core.Learning;
-using Decklan.ML.Core.Learning.Backpropagation;
+﻿using BassClefStudio.NeuralNet.Core;
+using BassClefStudio.NeuralNet.Core.Learning;
+using BassClefStudio.NeuralNet.Core.Learning.Backpropagation;
 using System;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Transactions;
 
-namespace Decklan.ML.Client
+namespace BassClefStudio.NeuralNet.Client
 {
     class Program
     {
@@ -17,6 +17,8 @@ namespace Decklan.ML.Client
         const double learningThreshold = 0.01;
         const double lowValue = 0.2;
         const double highValue = 0.8;
+        const int trialsPerLearn = 200;
+        const int maxTrials = 2500000;
 
         static void Main(string[] args)
         {
@@ -32,27 +34,45 @@ namespace Decklan.ML.Client
                 new Tuple<SampleData, int>(new SampleData(new double[]{ 1,1,1 }, new double[]{ 1,1 }), 1)
             });
 
-            NeuralNetwork = new NeuralNetwork(new int[] { 3, 6, 6, 2 });
-
-            ILearningAlgorithm learningAlgorithm = new BackpropagationLearningAlgorithm(0.25);
             double cost = 1;
-            Console.ForegroundColor = ConsoleColor.Gray;
-            var watch = System.Diagnostics.Stopwatch.StartNew();
             while (cost > learningThreshold)
             {
-                cost = learningAlgorithm.Teach(NeuralNetwork, SampleSet, 200);
+                NeuralNetwork = new NeuralNetwork(new int[] { 3, 6, 6, 2 }, -2, 2);
+
+                ILearningAlgorithm learningAlgorithm = new BackpropagationLearningAlgorithm(0.5);
+                cost = 1;
+                Console.ForegroundColor = ConsoleColor.Gray;
+                var watch = System.Diagnostics.Stopwatch.StartNew();
+                int trials = 0;
+                while (cost > learningThreshold && trials < maxTrials)
+                {
+                    cost = learningAlgorithm.Teach(NeuralNetwork, SampleSet, trialsPerLearn);
+                    trials += trialsPerLearn;
+
+                    Console.SetCursorPosition(0, 0);
+                    Console.ForegroundColor = ConsoleColor.White;
+                    Console.Write($"{cost:F4}: ");
+                    GetProgress(cost, trials);
+                    Console.WriteLine();
+                }
+
+                watch.Stop();
+                if (trials < maxTrials)
+                {
+                    Console.ForegroundColor = ConsoleColor.Green;
+                    Console.WriteLine($"Learning complete! Time elapsed - {watch.Elapsed.TotalSeconds} sec.");
+                }
+                else
+                {
+                    Console.ForegroundColor = ConsoleColor.Red;
+                    Console.WriteLine($"Learning failed! Time elapsed - {watch.Elapsed.TotalSeconds} sec. Restarting...");
+                    Console.ReadLine();
+                    Console.Clear();
+                }
                 
-                Console.SetCursorPosition(0,0);
-                Console.Write($"{cost:F4} ");
-                GetProgress(cost);
+                Console.ForegroundColor = ConsoleColor.Gray;
                 Console.WriteLine();
             }
-
-            Console.ForegroundColor = ConsoleColor.Green;
-            Console.WriteLine($"Learning complete! Time elapsed - {watch.Elapsed.TotalSeconds} sec.");
-            watch.Stop();
-            Console.ForegroundColor = ConsoleColor.Gray;
-            Console.WriteLine();
 
             PrintMap();
 
@@ -63,14 +83,21 @@ namespace Decklan.ML.Client
             Console.ReadLine();
         }
 
-        public static void GetProgress(double cost)
+        static int last = 0;
+        public static void GetProgress(double cost, int trials)
         {
             double percent = 1 - cost + learningThreshold;
-            Console.Write($"({percent * 100:F1}%) [");
+            Console.ForegroundColor = ConsoleColor.Cyan;
+            Console.Write($"{trials} trials, {percent * 100:F1}% ");
             int left = Console.CursorLeft;
-            int size = Console.WindowWidth - left - 1;
-            Console.Write("".PadRight((int)(percent * size), '#').PadRight(size, '-'));
-            Console.Write("]");
+            int size = Console.WindowWidth - left;
+            Console.ForegroundColor = ConsoleColor.Green;
+            Console.Write("[".PadRight((int)(percent * (size - 1)), '#').PadRight(size - 1, '-') + "]");
+            if (last > size)
+            {
+                Console.Write("".PadRight(last - size, ' '));
+            }
+            last = size;
         }
 
         public static void EvaluateSamples()

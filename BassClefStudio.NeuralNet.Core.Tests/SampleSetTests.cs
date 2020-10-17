@@ -1,11 +1,11 @@
-﻿using Decklan.ML.Core.Learning;
+﻿using BassClefStudio.NeuralNet.Core.Learning;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace Decklan.ML.Core.Tests
+namespace BassClefStudio.NeuralNet.Core.Tests
 {
     [TestClass]
     public class SampleSetTests
