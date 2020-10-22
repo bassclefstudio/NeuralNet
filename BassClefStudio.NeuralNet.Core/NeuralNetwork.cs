@@ -1,10 +1,15 @@
-﻿using Medallion;
+﻿using BassClefStudio.NeuralNet.Core.Helpers;
+using Medallion;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
 namespace BassClefStudio.NeuralNet.Core
 {
+    /// <summary>
+    /// Represents a basic neural network with weights, biases, and layers that can evaluate an array of <see cref="double"/> inputs and return an array of <see cref="double"/> outputs (see <seealso cref="FeedForward(double[])"/>).
+    /// </summary>
     public class NeuralNetwork
     {
         #region Properties
@@ -170,7 +175,10 @@ namespace BassClefStudio.NeuralNet.Core
             return value * (1 - value);
         }
 
-        //feed forward, inputs => outputs.
+        /// <summary>
+        /// Feeds an array of <see cref="double"/> inputs into the <see cref="NeuralNetwork"/> and retuns an array of <see cref="double"/> outputs.
+        /// </summary>
+        /// <param name="inputs">The collection of <see cref="double"/> values fed into the first layer of the <see cref="NeuralNetwork"/>.</param>
         public double[] FeedForward(double[] inputs)
         {
             for (int i = 0; i < inputs.Length; i++)
@@ -193,12 +201,47 @@ namespace BassClefStudio.NeuralNet.Core
         }
 
         #endregion
+        #region Equality
+
+        /// <inheritdoc/>
+        public static bool operator ==(NeuralNetwork a, NeuralNetwork b)
+        {
+            return a.Layers.SequenceEqual(b.Layers) 
+                && ArrayExtensions.AreEqual(a.Biases, b.Biases, (a2, b2) => ArrayExtensions.AreEqual(a2, b2)) 
+                && ArrayExtensions.AreEqual(a.Weights, b.Weights, (a2, b2) => ArrayExtensions.AreEqual(a2, b2, (a3, b3) => ArrayExtensions.AreEqual(a3, b3)));
+        }
+
+        /// <inheritdoc/>
+        public static bool operator !=(NeuralNetwork a, NeuralNetwork b)
+        {
+            return !(a == b);
+        }
+
+        /// <inheritdoc/>
+        public override bool Equals(object obj)
+        {
+            return obj is NeuralNetwork net
+                && this == net;
+        }
+
+        /// <inheritdoc/>
+        public override int GetHashCode()
+        {
+            return base.GetHashCode();
+        }
+        #endregion
     }
 
+    /// <summary>
+    /// An <see cref="Exception"/> thrown if the initialization of a <see cref="NeuralNetwork"/> fails.
+    /// </summary>
     public class NetworkCreationException : Exception
     {
+        /// <inheritdoc/>
         public NetworkCreationException() { }
+        /// <inheritdoc/>
         public NetworkCreationException(string message) : base(message) { }
+        /// <inheritdoc/>
         public NetworkCreationException(string message, Exception inner) : base(message, inner) { }
     }
 }

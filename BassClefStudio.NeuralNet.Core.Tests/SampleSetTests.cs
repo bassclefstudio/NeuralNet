@@ -11,7 +11,7 @@ namespace BassClefStudio.NeuralNet.Core.Tests
     public class SampleSetTests
     {
         [TestMethod]
-        public void CreateSampleSet()
+        public void IterateSampleSet()
         {
             var set = new SampleSet(new SampleData[]
             {
@@ -21,7 +21,7 @@ namespace BassClefStudio.NeuralNet.Core.Tests
                 new SampleData(new double[]{ 1,1 }, new double[]{ 0,1 })
             });
 
-            Console.WriteLine(string.Join("\r\n", set.SampleData.Select(d => string.Join(",", d.Input))));
+            Console.WriteLine(string.Join("\r\n", set.ShuffledData.Select(d => string.Join(",", d.Input))));
 
             for (int i = 0; i < 4; i++)
             {

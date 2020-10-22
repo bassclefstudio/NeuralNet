@@ -18,11 +18,15 @@ namespace BassClefStudio.NeuralNet.Core.Learning
         double Teach(NeuralNetwork network, SampleData data);
     }
 
+    /// <summary>
+    /// Provides extension methods for running <see cref="ILearningAlgorithm"/>s over sets of data.
+    /// </summary>
     public static class LearningExtensions
     {
         /// <summary>
         /// Passes a collection of <see cref="SampleData"/> objects to a given <see cref="NeuralNetwork"/> and adapts the parameters based on the <see cref="SampleData.ExpectedOutput"/>. Returns a <see cref="double"/> value indicating the average value of the <see cref="SampleData.GetCost(double[])"/> function of the network over each iteration.
         /// </summary>
+        /// <param name="algorithm">The given <see cref="ILearningAlgorithm"/> used to teach the <see cref="NeuralNetwork"/>.</param>
         /// <param name="network">The <see cref="NeuralNetwork"/> to test and teach.</param>
         /// <param name="data">The <see cref="SampleData"/> inputs and expected outputs to use for learning.</param>
         public static double Teach(this ILearningAlgorithm algorithm, NeuralNetwork network, IEnumerable<SampleData> data)
@@ -40,8 +44,10 @@ namespace BassClefStudio.NeuralNet.Core.Learning
         /// <summary>
         /// Passes a collection of <see cref="SampleData"/> objects to a given <see cref="NeuralNetwork"/> and adapts the parameters based on the <see cref="SampleData.ExpectedOutput"/>. Returns a <see cref="double"/> value indicating the average value of the <see cref="SampleData.GetCost(double[])"/> function of the network over each iteration.
         /// </summary>
+        /// <param name="algorithm">The given <see cref="ILearningAlgorithm"/> used to teach the <see cref="NeuralNetwork"/>.</param>
         /// <param name="network">The <see cref="NeuralNetwork"/> to test and teach.</param>
-        /// <param name="data">The <see cref="SampleData"/> inputs and expected outputs to use for learning.</param>
+        /// <param name="data">The <see cref="SampleSet"/> containing inputs and expected outputs (as <see cref="SampleData"/>) to use for learning.</param>
+        /// <param name="sampleSize">The number of <see cref="SampleData"/> objects to retrive from the <see cref="SampleSet"/> during this stage of learning.</param>
         public static double Teach(this ILearningAlgorithm algorithm, NeuralNetwork network, SampleSet data, int sampleSize)
         {
             return Teach(algorithm, network, data.GetSample(sampleSize));

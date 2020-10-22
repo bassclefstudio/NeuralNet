@@ -103,7 +103,7 @@ namespace BassClefStudio.NeuralNet.Client
         {
             Console.ForegroundColor = ConsoleColor.Cyan;
             Console.WriteLine("Tests:");
-            foreach (var sample in SampleSet.SampleData)
+            foreach (var sample in SampleSet.ShuffledData)
             {
                 var output = Evaluate(sample.Input);
                 Console.WriteLine($"Cost: {sample.GetCost(output):F4}");

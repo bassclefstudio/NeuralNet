@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
 namespace BassClefStudio.NeuralNet.Core.Learning
@@ -50,6 +51,31 @@ namespace BassClefStudio.NeuralNet.Core.Learning
 
                 return cost;
             }
+        }
+
+        /// <inheritdoc/>
+        public static bool operator ==(SampleData a, SampleData b)
+        {
+            return a.Input.SequenceEqual(b.Input) && a.ExpectedOutput.SequenceEqual(b.ExpectedOutput);
+        }
+
+        /// <inheritdoc/>
+        public static bool operator !=(SampleData a, SampleData b)
+        {
+            return !(a == b);
+        }
+
+        /// <inheritdoc/>
+        public override bool Equals(object obj)
+        {
+            return obj is SampleData data
+                && this == data;
+        }
+
+        /// <inheritdoc/>
+        public override int GetHashCode()
+        {
+            return base.GetHashCode();
         }
     }
 }
