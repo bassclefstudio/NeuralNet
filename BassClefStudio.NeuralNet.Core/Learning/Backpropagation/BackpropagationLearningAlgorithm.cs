@@ -60,7 +60,8 @@ namespace BassClefStudio.NeuralNet.Core.Learning.Backpropagation
             //// Calculates w' and b' for the last layer in the network.
             for (int i = 0; i < network.Layers[network.Layers.Length - 1]; i++)
             {
-                network.Biases[network.Layers.Length - 2][i] -= gamma[network.Layers.Length - 1][i] * LearningRate;
+                //// Previous: layer
+                network.Biases[layer + 1][i] -= gamma[network.Layers.Length - 1][i] * LearningRate;
                 for (int j = 0; j < network.Layers[layer]; j++)
                 {
                     network.Weights[layer][i][j] -= gamma[network.Layers.Length - 1][i] * network.Neurons[layer][j] * LearningRate;
