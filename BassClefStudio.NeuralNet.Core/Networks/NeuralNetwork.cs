@@ -39,7 +39,7 @@ namespace BassClefStudio.NeuralNet.Core.Networks
         /// <summary>
         /// A two-dimensional array of neuron activation values, with indexes [LayerId, NeuronId].
         /// </summary>
-        public double[][] Neurons 
+        public DoubleStore[][] Neurons 
         {
             get => ModelLayers.Select(l => l.Neurons.Select(n => n.Activation).ToArray()).ToArray(); 
             private set
@@ -57,7 +57,7 @@ namespace BassClefStudio.NeuralNet.Core.Networks
         /// <summary>
         /// A two-dimensional array of neuron bias values, with indexes [LayerId, NeuronId].
         /// </summary>
-        public double[][] Biases
+        public DoubleStore[][] Biases
         {
             get => ModelLayers.Select(l => l.Neurons.Select(n => n.Bias).ToArray()).ToArray();
             private set
@@ -75,7 +75,7 @@ namespace BassClefStudio.NeuralNet.Core.Networks
         /// <summary>
         /// A three-dimensional array of neuron connection weights, with indexes [LayerId, NeuronId, ConnectionId].
         /// </summary>
-        public double[][][] Weights
+        public DoubleStore[][][] Weights
         {
             get => ModelLayers.Skip(1).Select(l => l.Neurons.Select(n => n.Synapses.Select(s => s.Weight).ToArray()).ToArray()).ToArray();
             private set
