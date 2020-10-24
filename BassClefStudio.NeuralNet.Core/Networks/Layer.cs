@@ -21,6 +21,11 @@ namespace BassClefStudio.NeuralNet.Core.Networks
         }
 
         /// <summary>
+        /// Gets the size of the layer (count of <see cref="Neurons"/>) as an <see cref="int"/>.
+        /// </summary>
+        public int Size => Neurons.Length;
+
+        /// <summary>
         /// The collection of <see cref="Neurons"/> in this <see cref="Layer"/>.
         /// </summary>
         public Neuron[] Neurons { get; set; }

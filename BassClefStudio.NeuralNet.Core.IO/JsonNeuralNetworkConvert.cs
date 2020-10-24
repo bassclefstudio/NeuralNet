@@ -16,7 +16,7 @@ namespace BassClefStudio.NeuralNet.Core.IO
         {
             return new JObject(
                 new JProperty("Type", "NeuralNetwork"),
-                new JProperty("Layers", item.Layers),
+                new JProperty("Layers", item.LayerSizes),
                 new JProperty("Biases", item.Biases.Select(l => new JArray(l))),
                 new JProperty("Weights", item.Weights.Select(l => new JArray(l.Select(n => new JArray(n))))));
         }

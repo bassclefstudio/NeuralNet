@@ -48,7 +48,7 @@ namespace BassClefStudio.NeuralNet.Core.Learning.Backpropagation
             List<double[]> gammaList = new List<double[]>();
             for (int i = 0; i < network.Layers.Length; i++)
             {
-                gammaList.Add(new double[network.Layers[i]]);
+                gammaList.Add(new double[network.Layers[i].Size]);
             }
             gamma = gammaList.ToArray();
 
@@ -59,17 +59,17 @@ namespace BassClefStudio.NeuralNet.Core.Learning.Backpropagation
 
             int layer = network.Layers.Length - 2;
             //// Calculates w' and b' for the last layer in the network.
-            for (int i = 0; i < network.Layers[network.Layers.Length - 1]; i++)
+            for (int i = 0; i < network.Layers[network.Layers.Length - 1].Size; i++)
             {
                 //// Previous: layer
-                network.Biases[layer + 1][i] -= gamma[network.Layers.Length - 1][i] * LearningRate;
-                for (int j = 0; j < network.Layers[layer]; j++)
+                network.Layers[layer + 1][i].Bias -= gamma[network.Layers.Length - 1][i] * LearningRate;
+                for (int j = 0; j < network.Layers[layer].Size; j++)
                 {
-                    network.Weights[layer][i][j] -= gamma[network.Layers.Length - 1][i] * network.Neurons[layer][j] * LearningRate;
+                    network.Layers[layer][i].Synapses[j].Weight -= gamma[network.Layers.Length - 1][i] * network.Layers[layer][j].Activation * LearningRate;
                     //// Randomness:
                     if (Randomness != 0)
                     {
-                        network.Weights[layer][i][j] += Rand.Current.NextDouble(-Randomness, Randomness);
+                        network.Layers[layer][i].Synapses[j].Weight += Rand.Current.NextDouble(-Randomness, Randomness);
                     }
                 }
             }
@@ -79,40 +79,40 @@ namespace BassClefStudio.NeuralNet.Core.Learning.Backpropagation
             {
                 layer = i - 1;
                 //// Looking at layer after for the outputs of this layer.
-                for (int j = 0; j < network.Layers[i]; j++)
+                for (int j = 0; j < network.Layers[i].Size; j++)
                 {
                     gamma[i][j] = 0;
                     for (int k = 0; k < gamma[i + 1].Length; k++)
                     {
-                        gamma[i][j] = gamma[i + 1][k] * network.Weights[i][k][j];
+                        gamma[i][j] = gamma[i + 1][k] * network.Layers[i][k].Synapses[j].Weight;
                     }
                     //// Calculate resulting gamma.
                     gamma[i][j] *= network.ActivateDer(network.Neurons[i][j]);
                 }
 
                 //// Looking at layer after for the outputs of this layer.
-                for (int j = 0; j < network.Layers[i]; j++)
+                for (int j = 0; j < network.Layers[i].Size; j++)
                 {
                     //// Change biases by -gamma.
                     //network.Biases[layer][j] -= gamma[i][j] * LearningRate;
-                    network.Biases[i][j] -= gamma[i][j] * LearningRate;
+                    network.Layers[i][j].Bias -= gamma[i][j] * LearningRate;
 
                     //// Randomness:
                     if (Randomness != 0)
                     {
-                        network.Biases[i][j] += Rand.Current.NextDouble(-Randomness, Randomness);
+                        network.Layers[i][j].Bias += Rand.Current.NextDouble(-Randomness, Randomness);
                     }
 
                     //// Looking at current layer.
-                    for (int k = 0; k < network.Layers[layer]; k++)
+                    for (int k = 0; k < network.Layers[layer].Size; k++)
                     {
                         //// Change weights by -gamma.
-                        network.Weights[layer][j][k] -= gamma[i][j] * network.Neurons[i - 1][k] * LearningRate;
+                        network.Layers[layer][j].Synapses[k].Weight -= gamma[i][j] * network.Layers[i - 1][k].Activation * LearningRate;
 
                         //// Randomness:
                         if (Randomness != 0)
                         {
-                            network.Weights[layer][j][k] += Rand.Current.NextDouble(-Randomness, Randomness);
+                            network.Layers[layer][j].Synapses[k].Weight += Rand.Current.NextDouble(-Randomness, Randomness);
                         }
                     }
                 }
