@@ -6,6 +6,7 @@ using BassClefStudio.NeuralNet.Core.Learning.Backpropagation;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -38,117 +39,67 @@ namespace BassClefStudio.NeuralNet.Client
                 new Tuple<Node, int>(new Node(new double[]{ 1,1,1 }, new double[]{ 0,0,0,0,0,0,0,1 }), 1),
             });
 
-            double minCost = 1;
-            while (minCost > learningThreshold)
+            double cost = 1;
+            while (cost > learningThreshold)
             {
-                var watch = System.Diagnostics.Stopwatch.StartNew();
-
-                List<Task<Tuple<double, NeuralNetwork>>> tasks = new List<Task<Tuple<double, NeuralNetwork>>>();
-                List<Progress<double>> progresses = new List<Progress<double>>();
-                List<double> currentProgress = new List<double>();
-                for (int i = 0; i < 4; i++)
+                NeuralNetwork = new NeuralNetwork(new int[] { 3, 6, 6, 8 }, -2, 2);
+                INodeLearningAlgorithm learningAlgorithm = new BackpropagationLearningAlgorithm(0.5);
+                cost = 1;
+                int trials = 0;
+                Stopwatch stopwatch = Stopwatch.StartNew();
+                while (cost > learningThreshold && trials < maxTrials)
                 {
-                    var p = new Progress<double>();
-                    progresses.Add(p);
-                    currentProgress.Add(1);
-                    int index = progresses.Count - 1;
-                    tasks.Add(AttemptTeachNeuralNetworkAsync(SampleSet, p));
-                    p.ProgressChanged += P_ProgressChanged;
+                    cost = learningAlgorithm.Teach(NeuralNetwork, SampleSet, trialsPerLearn);
+                    WriteProgress(0);
+                    trials += trialsPerLearn;
                 }
 
-                void P_ProgressChanged(object sender, double e)
-                {
-                    int indexOf = progresses.IndexOf((Progress<double>)sender);
-                    currentProgress[indexOf] = e; WriteProgresses(indexOf);
-                }
-
-                void WriteProgresses(int indexOf)
+                void WriteProgress(int indexOf)
                 {
                     lock (l)
                     {
                         Console.ForegroundColor = ConsoleColor.Gray;
                         Console.SetCursorPosition(0, indexOf);
                         Console.ForegroundColor = ConsoleColor.White;
-                        Console.Write($"{currentProgress[indexOf]:F4}: ");
-                        GetProgress(currentProgress[indexOf]);
+                        Console.Write($"{cost:F4}: ");
+                        GetProgress(cost);
                         Console.WriteLine();
                     }
                 }
 
-                var result = await Task.WhenAny(tasks.ToArray());
-                int indexOfResult = tasks.IndexOf(result);
-                watch.Stop();
-                foreach (var p in progresses)
-                {
-                    p.ProgressChanged -= P_ProgressChanged;
-                }
-                //var success = result.FirstOrDefault(r => r.Item1 < learningThreshold);
-                var success = await result;
-                currentProgress[indexOfResult] = success.Item1;
-
-                if (success != null)
+                if (cost <= learningThreshold)
                 {
                     Console.Clear();
-                    for (int i = 0; i < progresses.Count; i++)
-                    {
-                        WriteProgresses(i);
-                    }
-                    minCost = success.Item1;
-                    NeuralNetwork = success.Item2;
+                    WriteProgress(0);
                     Console.ForegroundColor = ConsoleColor.Green;
                     Console.WriteLine($"Learning complete!");
                     Console.ForegroundColor = ConsoleColor.Gray;
-                    Console.WriteLine($"Cost - {success.Item1}");
-                    Console.WriteLine($"Time elapsed - {watch.Elapsed.TotalSeconds} sec.");
+                    Console.WriteLine($"Cost - {cost}");
+                    Console.WriteLine($"Time elapsed - {stopwatch.Elapsed.TotalSeconds} sec.");
                     Console.ReadLine();
                 }
                 else
                 {
                     Console.Clear();
-                    for (int i = 0; i < progresses.Count; i++)
-                    {
-                        WriteProgresses(i);
-                    }
+                    WriteProgress(0);
                     Console.ForegroundColor = ConsoleColor.Red;
                     Console.WriteLine($"Learning failed!");
                     Console.ForegroundColor = ConsoleColor.Gray;
-                    Console.WriteLine($"Min Cost - {currentProgress.Min()}");
-                    Console.WriteLine($"Time elapsed - {watch.Elapsed.TotalSeconds} sec.");
+                    Console.WriteLine($"Cost - {cost}");
+                    Console.WriteLine($"Time elapsed - {stopwatch.Elapsed.TotalSeconds} sec.");
                     Console.ForegroundColor = ConsoleColor.Cyan;
                     Console.Write($"Press [ENTER] to restart.");
                     Console.ReadLine();
                     Console.Clear();
                 }
-                
+
                 Console.ForegroundColor = ConsoleColor.Gray;
             }
 
             PrintMap();
-
             Console.WriteLine();
-
             EvaluateSamples();
-
             Console.ReadLine();
-        }
-
-        public static async Task<Tuple<double, NeuralNetwork>> AttemptTeachNeuralNetworkAsync(NodeSet set, IProgress<double> progress)
-        {
-            return await Task.Run(() => AttemptTeachNeuralNetwork(set, progress));
-        }
-        private static Tuple<double, NeuralNetwork> AttemptTeachNeuralNetwork(NodeSet baseSet, IProgress<double> progress)
-        {
-            NeuralNetwork network = new NeuralNetwork(new int[] { 3, 6, 6, 8 }, -2, 2);
-            INodeLearningAlgorithm learningAlgorithm = new BackpropagationLearningAlgorithm(0.5);
-            double cost = 1;
-            NodeSet set = baseSet.Copy();
-            while (cost > learningThreshold)
-            {
-                double c = learningAlgorithm.Teach(network, set, trialsPerLearn);
-                cost = c;
-                progress.Report(c);
-            }
-            return new Tuple<double, NeuralNetwork>(cost, network);
         }
 
         static int last = 0;

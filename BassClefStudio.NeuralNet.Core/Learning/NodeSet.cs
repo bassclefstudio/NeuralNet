@@ -21,7 +21,7 @@ namespace BassClefStudio.NeuralNet.Core.Learning
         /// <summary>
         /// The collection of <see cref="Node"/> in this <see cref="NodeSet"/>.
         /// </summary>
-        public IEnumerable<Node> SetData { get => setData; protected set { setData = value; ShuffledData = value.Shuffled().ToArray(); } }
+        public IEnumerable<Node> SetData { get => setData; protected set { setData = value; ShuffledData = IsShuffled ? value.Shuffled().ToArray() : value.ToArray(); } }
 
         /// <summary>
         /// A <see cref="bool"/> value indicating whether 
@@ -62,9 +62,11 @@ namespace BassClefStudio.NeuralNet.Core.Learning
         /// <inheritdoc/>
         public IEnumerable<Node> GetData()
         {
-            int count = ShuffledData.Length;
-            index = (index + 1) % count;
-            yield return ShuffledData[index];
+            while (true)
+            {
+                yield return ShuffledData[index];
+                index = (index + 1) % ShuffledData.Length;
+            }
         }
 
         /// <summary>

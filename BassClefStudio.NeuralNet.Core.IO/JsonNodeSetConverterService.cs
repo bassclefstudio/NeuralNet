@@ -14,12 +14,12 @@ namespace BassClefStudio.NeuralNet.Core.IO
     /// <summary>
     /// A <see cref="ConverterService{TItem, TInput, TOutput}"/> for serializing and deserializing neural network <see cref="NodeSet"/>s.
     /// </summary>
-    public class JsonSampleSetConverterService : ConverterService<NodeSet, JToken, JToken>
+    public class JsonNodeSetConverterService : ConverterService<NodeSet, JToken, JToken>
     {
         /// <summary>
         /// Creates a new <see cref="JsonNeuralNetworkConverterService"/>.
         /// </summary>
-        public JsonSampleSetConverterService() : base(typeof(JsonSampleSetConverterService).GetTypeInfo().Assembly)
+        public JsonNodeSetConverterService() : base(typeof(JsonNodeSetConverterService).GetTypeInfo().Assembly)
         { }
 
         /// <inheritdoc/>

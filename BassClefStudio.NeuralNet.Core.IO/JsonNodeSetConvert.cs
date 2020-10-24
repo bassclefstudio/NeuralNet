@@ -9,9 +9,9 @@ using System.Text;
 
 namespace BassClefStudio.NeuralNet.Core.IO
 {
-    internal class SampleSetToJsonConverter : IToJsonConverter<NodeSet>
+    internal class NodeSetToJsonConverter : IToJsonConverter<NodeSet>
     {
-        public IToJsonConverter<Node> SampleDataConverter { get; set; }
+        public IToJsonConverter<Node> NodeConverter { get; set; }
 
         /// <inheritdoc/>
         public bool CanConvert(NodeSet item) => true;
@@ -20,22 +20,22 @@ namespace BassClefStudio.NeuralNet.Core.IO
         public JToken Convert(NodeSet item)
         {
             return new JObject(
-                new JProperty("Type", "SampleSet"),
+                new JProperty("Type", "NodeSet"),
                 new JProperty("IsShuffled", item.IsShuffled),
-                new JProperty("Data", item.SetData.Select(d => SampleDataConverter.GetTo(d))));
+                new JProperty("Data", item.SetData.Select(d => NodeConverter.GetTo(d))));
         }
     }
 
-    internal class SampleSetFromJsonConverter : IFromJsonConverter<NodeSet>
+    internal class NodeSetFromJsonConverter : IFromJsonConverter<NodeSet>
     {
-        public IFromJsonConverter<Node> SampleDataConverter { get; set; }
+        public IFromJsonConverter<Node> NodeConverter { get; set; }
 
-        public bool CanConvert(JToken item) => item.IsJsonType("SampleSet");
+        public bool CanConvert(JToken item) => item.IsJsonType("NodeSet");
 
         public NodeSet Convert(JToken item)
         {
             bool isShuffled = item["IsShuffled"].Value<bool>();
-            Node[] data = item["Data"].Select(d => SampleDataConverter.GetTo(d)).ToArray();
+            Node[] data = item["Data"].Select(d => NodeConverter.GetTo(d)).ToArray();
             return new NodeSet(data, isShuffled);
         }
     }

@@ -8,22 +8,22 @@ using System.Text;
 
 namespace BassClefStudio.NeuralNet.Core.IO
 {
-    internal class SampleDataToJsonConverter : IToJsonConverter<Node>
+    internal class NodeToJsonConverter : IToJsonConverter<Node>
     {
         public bool CanConvert(Node item) => true;
 
         public JToken Convert(Node item)
         {
             return new JObject(
-                new JProperty("Type", "SampleData"),
+                new JProperty("Type", "Node"),
                 new JProperty("Inputs", item.Input),
                 new JProperty("Outputs", item.ExpectedOutput));
         }
     }
 
-    internal class SampleDataFromJsonConverter : IFromJsonConverter<Node>
+    internal class NodeFromJsonConverter : IFromJsonConverter<Node>
     {
-        public bool CanConvert(JToken item) => item.IsJsonType("SampleData");
+        public bool CanConvert(JToken item) => item.IsJsonType("Node");
 
         public Node Convert(JToken item)
         {

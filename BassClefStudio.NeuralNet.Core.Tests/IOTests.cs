@@ -110,7 +110,7 @@ namespace BassClefStudio.NeuralNet.Core.Tests
         }
 
         [TestMethod]
-        public void CreateSampleSet()
+        public void CreateNodeSet()
         {
             NodeSet set = new NodeSet(
                 new Node[]
@@ -122,7 +122,7 @@ namespace BassClefStudio.NeuralNet.Core.Tests
                     new Node(new double[]{ 4.6, 3 }, new double[]{ 0.7 }),
                     new Node(new double[]{ 33.4, 0.1 }, new double[]{ 0 })
                 });
-            using (var service = new JsonSampleSetConverterService())
+            using (var service = new JsonNodeSetConverterService())
             {
                 var json = service.WriteItem(set);
                 Console.WriteLine(json.ToString(Formatting.None));
