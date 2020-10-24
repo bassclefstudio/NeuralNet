@@ -7,5 +7,10 @@ namespace BassClefStudio.NeuralNet.Core.Networks
     public class Synapse
     {
         public double Weight { get; set; }
+
+        public Synapse(double weight)
+        {
+            Weight = weight;
+        }
     }
 }
