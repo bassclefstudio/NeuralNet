@@ -9,8 +9,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BassClefStudio.NeuralNet.Co
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BassClefStudio.NeuralNet.Core.Tests", "BassClefStudio.NeuralNet.Core.Tests\BassClefStudio.NeuralNet.Core.Tests.csproj", "{8B524503-4A1F-4C9C-8E37-050D35665397}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BassClefStudio.NeuralNet.Console", "BassClefStudio.NeuralNet.Console\BassClefStudio.NeuralNet.Console.csproj", "{5EBF2FE4-D245-4E52-B13C-E195FD5AC42A}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -43,14 +41,6 @@ Global
 		{8B524503-4A1F-4C9C-8E37-050D35665397}.Release|Any CPU.Build.0 = Release|Any CPU
 		{8B524503-4A1F-4C9C-8E37-050D35665397}.Release|x64.ActiveCfg = Release|x64
 		{8B524503-4A1F-4C9C-8E37-050D35665397}.Release|x64.Build.0 = Release|x64
-		{5EBF2FE4-D245-4E52-B13C-E195FD5AC42A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{5EBF2FE4-D245-4E52-B13C-E195FD5AC42A}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{5EBF2FE4-D245-4E52-B13C-E195FD5AC42A}.Debug|x64.ActiveCfg = Debug|x64
-		{5EBF2FE4-D245-4E52-B13C-E195FD5AC42A}.Debug|x64.Build.0 = Debug|x64
-		{5EBF2FE4-D245-4E52-B13C-E195FD5AC42A}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{5EBF2FE4-D245-4E52-B13C-E195FD5AC42A}.Release|Any CPU.Build.0 = Release|Any CPU
-		{5EBF2FE4-D245-4E52-B13C-E195FD5AC42A}.Release|x64.ActiveCfg = Release|x64
-		{5EBF2FE4-D245-4E52-B13C-E195FD5AC42A}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
