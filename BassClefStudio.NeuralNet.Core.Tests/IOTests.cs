@@ -1,5 +1,7 @@
 using BassClefStudio.NeuralNet.Core.IO;
+using BassClefStudio.NeuralNet.Core.Learning;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Newtonsoft.Json;
 using System;
 using System.Reflection;
 
@@ -15,9 +17,8 @@ namespace BassClefStudio.NeuralNet.Core.Tests
             using (var service = new JsonNeuralNetworkConverterService())
             {
                 var json = service.WriteItem(network);
-                Console.WriteLine(json.ToString());
-                var deserialized = service.ReadItem(json);
-                Assert.IsTrue(deserialized.Weights[1][0].Length == 3);
+                Console.WriteLine(json.ToString(Formatting.None));
+                Assert.AreEqual(network, service.ReadItem(json), "The serialized network was not deserialized into an equivalent network to the original.");
             }
         }
 
@@ -106,6 +107,27 @@ namespace BassClefStudio.NeuralNet.Core.Tests
                             new double[] { 1, 1, 1 }
                         }
                     }));
+        }
+
+        [TestMethod]
+        public void CreateNodeSet()
+        {
+            NodeSet set = new NodeSet(
+                new Node[]
+                {
+                    //// Random data set.
+                    new Node(new double[]{ 0, 1 }, new double[]{ 1 }),
+                    new Node(new double[]{ 0.5, 0.75 }, new double[]{ 0.5 }),
+                    new Node(new double[]{ 10, -14 }, new double[]{ 0.6 }),
+                    new Node(new double[]{ 4.6, 3 }, new double[]{ 0.7 }),
+                    new Node(new double[]{ 33.4, 0.1 }, new double[]{ 0 })
+                });
+            using (var service = new JsonNodeSetConverterService())
+            {
+                var json = service.WriteItem(set);
+                Console.WriteLine(json.ToString(Formatting.None));
+                Assert.AreEqual(set, service.ReadItem(json), "The serialized set was not deserialized into an equivalent set to the original.");
+            }
         }
     }
 }

@@ -10,23 +10,23 @@ namespace BassClefStudio.NeuralNet.Core.Learning.Backpropagation
     /// <summary>
     /// Represents a service that teaches a <see cref="NeuralNetwork"/> using backpropagation to adjust relevant parameters.
     /// </summary>
-    public class BackpropagationLearningAlgorithm : ILearningAlgorithm
+    public class BackpropagationLearningAlgorithm : INodeLearningAlgorithm
     {
         /// <summary>
-        /// A <see cref="double"/> value indicating how much of a change to the parameters should be made each time the <see cref="Teach(NeuralNetwork, SampleData)"/> method is called.
+        /// A <see cref="double"/> value indicating how much of a change to the parameters should be made each time the <see cref="Teach(NeuralNetwork, Node)"/> method is called.
         /// </summary>
         public double LearningRate { get; set; }
 
         /// <summary>
-        /// A <see cref="double"/> value indicating how much random change to the parameters should be made each time the <see cref="Teach(NeuralNetwork, SampleData)"/> method is called.
+        /// A <see cref="double"/> value indicating how much random change to the parameters should be made each time the <see cref="Teach(NeuralNetwork, Node)"/> method is called.
         /// </summary>
         public double Randomness { get; set; }
 
         /// <summary>
         /// Creates a basic instance of the <see cref="BackpropagationLearningAlgorithm"/> from the given learning rate.
         /// </summary>
-        /// <param name="learningRate">A <see cref="double"/> value indicating how much of a change to the parameters should be made each time the <see cref="Teach(NeuralNetwork, SampleData)"/> method is called.</param>
-        /// <param name="randomness">A <see cref="double"/> value indicating how much random change to the parameters should be made each time the <see cref="Teach(NeuralNetwork, SampleData)"/> method is called.</param>
+        /// <param name="learningRate">A <see cref="double"/> value indicating how much of a change to the parameters should be made each time the <see cref="Teach(NeuralNetwork, Node)"/> method is called.</param>
+        /// <param name="randomness">A <see cref="double"/> value indicating how much random change to the parameters should be made each time the <see cref="Teach(NeuralNetwork, Node)"/> method is called.</param>
         public BackpropagationLearningAlgorithm(double learningRate = 0.1, double randomness = 0)
         {
             LearningRate = learningRate;
@@ -34,7 +34,7 @@ namespace BassClefStudio.NeuralNet.Core.Learning.Backpropagation
         }
 
         /// <inheritdoc/>
-        public double Teach(NeuralNetwork network, SampleData data)
+        public double Teach(NeuralNetwork network, Node data)
         {
             double[] output = network.FeedForward(data.Input);
             double cost = data.GetCost(output);
@@ -60,7 +60,8 @@ namespace BassClefStudio.NeuralNet.Core.Learning.Backpropagation
             //// Calculates w' and b' for the last layer in the network.
             for (int i = 0; i < network.Layers[network.Layers.Length - 1]; i++)
             {
-                network.Biases[network.Layers.Length - 2][i] -= gamma[network.Layers.Length - 1][i] * LearningRate;
+                //// Previous: layer
+                network.Biases[layer + 1][i] -= gamma[network.Layers.Length - 1][i] * LearningRate;
                 for (int j = 0; j < network.Layers[layer]; j++)
                 {
                     network.Weights[layer][i][j] -= gamma[network.Layers.Length - 1][i] * network.Neurons[layer][j] * LearningRate;
