@@ -13,11 +13,9 @@ namespace BassClefStudio.NeuralNet.Core.Networks
 
         public Synapse[] Synapses { get; set; }
 
-        public Neuron(double bias, IEnumerable<Synapse> synapses) : this(bias, synapses.ToArray()) { }
-        public Neuron(double bias, Synapse[] synapses)
+        public Neuron(double activation)
         {
-            Bias = bias;
-            Synapses = synapses;
+            Activation = activation;
         }
     }
 }

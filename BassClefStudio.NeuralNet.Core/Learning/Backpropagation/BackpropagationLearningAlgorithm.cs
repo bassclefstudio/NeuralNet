@@ -1,4 +1,5 @@
-﻿using Medallion;
+﻿using BassClefStudio.NeuralNet.Core.Networks;
+using Medallion;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;

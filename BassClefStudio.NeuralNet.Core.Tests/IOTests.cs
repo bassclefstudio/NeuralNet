@@ -1,5 +1,6 @@
 using BassClefStudio.NeuralNet.Core.IO;
 using BassClefStudio.NeuralNet.Core.Learning;
+using BassClefStudio.NeuralNet.Core.Networks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Newtonsoft.Json;
 using System;

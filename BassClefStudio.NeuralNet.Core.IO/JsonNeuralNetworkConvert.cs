@@ -1,4 +1,5 @@
-﻿using BassClefStudio.Serialization.Json;
+﻿using BassClefStudio.NeuralNet.Core.Networks;
+using BassClefStudio.Serialization.Json;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
