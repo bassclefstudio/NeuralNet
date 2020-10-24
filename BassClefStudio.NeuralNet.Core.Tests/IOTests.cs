@@ -112,15 +112,15 @@ namespace BassClefStudio.NeuralNet.Core.Tests
         [TestMethod]
         public void CreateSampleSet()
         {
-            SampleSet set = new SampleSet(
-                new SampleData[]
+            NodeSet set = new NodeSet(
+                new Node[]
                 {
                     //// Random data set.
-                    new SampleData(new double[]{ 0, 1 }, new double[]{ 1 }),
-                    new SampleData(new double[]{ 0.5, 0.75 }, new double[]{ 0.5 }),
-                    new SampleData(new double[]{ 10, -14 }, new double[]{ 0.6 }),
-                    new SampleData(new double[]{ 4.6, 3 }, new double[]{ 0.7 }),
-                    new SampleData(new double[]{ 33.4, 0.1 }, new double[]{ 0 })
+                    new Node(new double[]{ 0, 1 }, new double[]{ 1 }),
+                    new Node(new double[]{ 0.5, 0.75 }, new double[]{ 0.5 }),
+                    new Node(new double[]{ 10, -14 }, new double[]{ 0.6 }),
+                    new Node(new double[]{ 4.6, 3 }, new double[]{ 0.7 }),
+                    new Node(new double[]{ 33.4, 0.1 }, new double[]{ 0 })
                 });
             using (var service = new JsonSampleSetConverterService())
             {

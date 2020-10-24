@@ -12,9 +12,9 @@ using System.Text;
 namespace BassClefStudio.NeuralNet.Core.IO
 {
     /// <summary>
-    /// A <see cref="ConverterService{TItem, TInput, TOutput}"/> for serializing and deserializing neural network <see cref="SampleSet"/>s.
+    /// A <see cref="ConverterService{TItem, TInput, TOutput}"/> for serializing and deserializing neural network <see cref="NodeSet"/>s.
     /// </summary>
-    public class JsonSampleSetConverterService : ConverterService<SampleSet, JToken, JToken>
+    public class JsonSampleSetConverterService : ConverterService<NodeSet, JToken, JToken>
     {
         /// <summary>
         /// Creates a new <see cref="JsonNeuralNetworkConverterService"/>.
@@ -23,16 +23,16 @@ namespace BassClefStudio.NeuralNet.Core.IO
         { }
 
         /// <inheritdoc/>
-        public override SampleSet ReadItem(JToken input)
+        public override NodeSet ReadItem(JToken input)
         {
-            var service = ConverterContainer.Resolve<IFromJsonConverter<SampleSet>>();
+            var service = ConverterContainer.Resolve<IFromJsonConverter<NodeSet>>();
             return service.GetTo(input);
         }
 
         /// <inheritdoc/>
-        public override JToken WriteItem(SampleSet item)
+        public override JToken WriteItem(NodeSet item)
         {
-            var service = ConverterContainer.Resolve<IToJsonConverter<SampleSet>>();
+            var service = ConverterContainer.Resolve<IToJsonConverter<NodeSet>>();
             return service.GetTo(item);
         }
     }

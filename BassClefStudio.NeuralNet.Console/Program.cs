@@ -13,7 +13,7 @@ namespace BassClefStudio.NeuralNet.Client
 {
     class Program
     {
-        static SampleSet SampleSet;
+        static NodeSet SampleSet;
         static NeuralNetwork NeuralNetwork;
 
         const double learningThreshold = 0.01;
@@ -26,16 +26,16 @@ namespace BassClefStudio.NeuralNet.Client
         static async Task Main(string[] args)
         {
             //// Test sample data - counting how many of the given data values were high (1) in binary in the output.
-            SampleSet = new SampleSet(new Tuple<SampleData, int>[]
+            SampleSet = new NodeSet(new Tuple<Node, int>[]
             {
-                new Tuple<SampleData, int>(new SampleData(new double[]{ 0,0,0 }, new double[]{ 1,0,0,0,0,0,0,0 }), 1),
-                new Tuple<SampleData, int>(new SampleData(new double[]{ 0,0,1 }, new double[]{ 0,1,0,0,0,0,0,0 }), 1),
-                new Tuple<SampleData, int>(new SampleData(new double[]{ 0,1,0 }, new double[]{ 0,0,1,0,0,0,0,0 }), 1),
-                new Tuple<SampleData, int>(new SampleData(new double[]{ 0,1,1 }, new double[]{ 0,0,0,1,0,0,0,0 }), 1),
-                new Tuple<SampleData, int>(new SampleData(new double[]{ 1,0,0 }, new double[]{ 0,0,0,0,1,0,0,0 }), 1),
-                new Tuple<SampleData, int>(new SampleData(new double[]{ 1,0,1 }, new double[]{ 0,0,0,0,0,1,0,0 }), 1),
-                new Tuple<SampleData, int>(new SampleData(new double[]{ 1,1,0 }, new double[]{ 0,0,0,0,0,0,1,0 }), 1),
-                new Tuple<SampleData, int>(new SampleData(new double[]{ 1,1,1 }, new double[]{ 0,0,0,0,0,0,0,1 }), 1),
+                new Tuple<Node, int>(new Node(new double[]{ 0,0,0 }, new double[]{ 1,0,0,0,0,0,0,0 }), 1),
+                new Tuple<Node, int>(new Node(new double[]{ 0,0,1 }, new double[]{ 0,1,0,0,0,0,0,0 }), 1),
+                new Tuple<Node, int>(new Node(new double[]{ 0,1,0 }, new double[]{ 0,0,1,0,0,0,0,0 }), 1),
+                new Tuple<Node, int>(new Node(new double[]{ 0,1,1 }, new double[]{ 0,0,0,1,0,0,0,0 }), 1),
+                new Tuple<Node, int>(new Node(new double[]{ 1,0,0 }, new double[]{ 0,0,0,0,1,0,0,0 }), 1),
+                new Tuple<Node, int>(new Node(new double[]{ 1,0,1 }, new double[]{ 0,0,0,0,0,1,0,0 }), 1),
+                new Tuple<Node, int>(new Node(new double[]{ 1,1,0 }, new double[]{ 0,0,0,0,0,0,1,0 }), 1),
+                new Tuple<Node, int>(new Node(new double[]{ 1,1,1 }, new double[]{ 0,0,0,0,0,0,0,1 }), 1),
             });
 
             double minCost = 1;
@@ -58,28 +58,25 @@ namespace BassClefStudio.NeuralNet.Client
 
                 void P_ProgressChanged(object sender, double e)
                 {
-                    currentProgress[progresses.IndexOf((Progress<double>)sender)] = e; WriteProgresses();
+                    int indexOf = progresses.IndexOf((Progress<double>)sender);
+                    currentProgress[indexOf] = e; WriteProgresses(indexOf);
                 }
 
-                void WriteProgresses()
+                void WriteProgresses(int indexOf)
                 {
                     lock (l)
                     {
                         Console.ForegroundColor = ConsoleColor.Gray;
-                        int line = 0;
-                        foreach (var p in currentProgress.ToArray())
-                        {
-                            Console.SetCursorPosition(0, line);
-                            Console.ForegroundColor = ConsoleColor.White;
-                            Console.Write($"{p:F4}: ");
-                            GetProgress(p);
-                            line++;
-                        }
+                        Console.SetCursorPosition(0, indexOf);
+                        Console.ForegroundColor = ConsoleColor.White;
+                        Console.Write($"{currentProgress[indexOf]:F4}: ");
+                        GetProgress(currentProgress[indexOf]);
                         Console.WriteLine();
                     }
                 }
 
                 var result = await Task.WhenAny(tasks.ToArray());
+                int indexOfResult = tasks.IndexOf(result);
                 watch.Stop();
                 foreach (var p in progresses)
                 {
@@ -87,11 +84,15 @@ namespace BassClefStudio.NeuralNet.Client
                 }
                 //var success = result.FirstOrDefault(r => r.Item1 < learningThreshold);
                 var success = await result;
+                currentProgress[indexOfResult] = success.Item1;
 
                 if (success != null)
                 {
                     Console.Clear();
-                    WriteProgresses();
+                    for (int i = 0; i < progresses.Count; i++)
+                    {
+                        WriteProgresses(i);
+                    }
                     minCost = success.Item1;
                     NeuralNetwork = success.Item2;
                     Console.ForegroundColor = ConsoleColor.Green;
@@ -104,7 +105,10 @@ namespace BassClefStudio.NeuralNet.Client
                 else
                 {
                     Console.Clear();
-                    WriteProgresses();
+                    for (int i = 0; i < progresses.Count; i++)
+                    {
+                        WriteProgresses(i);
+                    }
                     Console.ForegroundColor = ConsoleColor.Red;
                     Console.WriteLine($"Learning failed!");
                     Console.ForegroundColor = ConsoleColor.Gray;
@@ -128,19 +132,21 @@ namespace BassClefStudio.NeuralNet.Client
             Console.ReadLine();
         }
 
-        public static async Task<Tuple<double, NeuralNetwork>> AttemptTeachNeuralNetworkAsync(SampleSet set, IProgress<double> progress)
+        public static async Task<Tuple<double, NeuralNetwork>> AttemptTeachNeuralNetworkAsync(NodeSet set, IProgress<double> progress)
         {
             return await Task.Run(() => AttemptTeachNeuralNetwork(set, progress));
         }
-        private static Tuple<double, NeuralNetwork> AttemptTeachNeuralNetwork(SampleSet set, IProgress<double> progress)
+        private static Tuple<double, NeuralNetwork> AttemptTeachNeuralNetwork(NodeSet baseSet, IProgress<double> progress)
         {
             NeuralNetwork network = new NeuralNetwork(new int[] { 3, 6, 6, 8 }, -2, 2);
-            ILearningAlgorithm learningAlgorithm = new BackpropagationLearningAlgorithm(0.5);
+            INodeLearningAlgorithm learningAlgorithm = new BackpropagationLearningAlgorithm(0.5);
             double cost = 1;
+            NodeSet set = baseSet.Copy();
             while (cost > learningThreshold)
             {
-                cost = learningAlgorithm.Teach(network, set, trialsPerLearn);
-                progress.Report(cost);
+                double c = learningAlgorithm.Teach(network, set, trialsPerLearn);
+                cost = c;
+                progress.Report(c);
             }
             return new Tuple<double, NeuralNetwork>(cost, network);
         }

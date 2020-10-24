@@ -8,17 +8,17 @@ using System.Text;
 namespace BassClefStudio.NeuralNet.Core.Tests
 {
     [TestClass]
-    public class SampleSetTests
+    public class NodeSetTests
     {
         [TestMethod]
         public void IterateSampleSet()
         {
-            var set = new SampleSet(new SampleData[]
+            var set = new NodeSet(new Node[]
             {
-                new SampleData(new double[]{ 0,0 }, new double[]{ 1,0 }),
-                new SampleData(new double[]{ 1,0 }, new double[]{ 1,0 }),
-                new SampleData(new double[]{ 0,1 }, new double[]{ 1,0 }),
-                new SampleData(new double[]{ 1,1 }, new double[]{ 0,1 })
+                new Node(new double[]{ 0,0 }, new double[]{ 1,0 }),
+                new Node(new double[]{ 1,0 }, new double[]{ 1,0 }),
+                new Node(new double[]{ 0,1 }, new double[]{ 1,0 }),
+                new Node(new double[]{ 1,1 }, new double[]{ 0,1 })
             });
 
             Console.WriteLine(string.Join("\r\n", set.ShuffledData.Select(d => string.Join(",", d.Input))));
@@ -26,11 +26,11 @@ namespace BassClefStudio.NeuralNet.Core.Tests
             for (int i = 0; i < 4; i++)
             {
                 Console.WriteLine("---");
-                Console.WriteLine(string.Join("\r\n", set.GetSample(3).Select(d => string.Join(",", d.Input))));
+                Console.WriteLine(string.Join("\r\n", set.GetData().Take(3).Select(d => string.Join(",", d.Input))));
             }
 
             Console.WriteLine("---");
-            Console.WriteLine(string.Join("\r\n", set.GetSample(6).Select(d => string.Join(",", d.Input))));
+            Console.WriteLine(string.Join("\r\n", set.GetData().Take(6).Select(d => string.Join(",", d.Input))));
 
         }
     }

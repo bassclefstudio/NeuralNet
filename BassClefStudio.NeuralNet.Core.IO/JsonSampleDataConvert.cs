@@ -8,11 +8,11 @@ using System.Text;
 
 namespace BassClefStudio.NeuralNet.Core.IO
 {
-    internal class SampleDataToJsonConverter : IToJsonConverter<SampleData>
+    internal class SampleDataToJsonConverter : IToJsonConverter<Node>
     {
-        public bool CanConvert(SampleData item) => true;
+        public bool CanConvert(Node item) => true;
 
-        public JToken Convert(SampleData item)
+        public JToken Convert(Node item)
         {
             return new JObject(
                 new JProperty("Type", "SampleData"),
@@ -21,15 +21,15 @@ namespace BassClefStudio.NeuralNet.Core.IO
         }
     }
 
-    internal class SampleDataFromJsonConverter : IFromJsonConverter<SampleData>
+    internal class SampleDataFromJsonConverter : IFromJsonConverter<Node>
     {
         public bool CanConvert(JToken item) => item.IsJsonType("SampleData");
 
-        public SampleData Convert(JToken item)
+        public Node Convert(JToken item)
         {
             double[] inputs = item["Inputs"].Select(v => v.Value<double>()).ToArray();
             double[] outputs = item["Outputs"].Select(v => v.Value<double>()).ToArray();
-            return new SampleData(inputs, outputs);
+            return new Node(inputs, outputs);
         }
     }
 }

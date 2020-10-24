@@ -9,15 +9,15 @@ using System.Text;
 
 namespace BassClefStudio.NeuralNet.Core.IO
 {
-    internal class SampleSetToJsonConverter : IToJsonConverter<SampleSet>
+    internal class SampleSetToJsonConverter : IToJsonConverter<NodeSet>
     {
-        public IToJsonConverter<SampleData> SampleDataConverter { get; set; }
+        public IToJsonConverter<Node> SampleDataConverter { get; set; }
 
         /// <inheritdoc/>
-        public bool CanConvert(SampleSet item) => true;
+        public bool CanConvert(NodeSet item) => true;
 
         /// <inheritdoc/>
-        public JToken Convert(SampleSet item)
+        public JToken Convert(NodeSet item)
         {
             return new JObject(
                 new JProperty("Type", "SampleSet"),
@@ -26,17 +26,17 @@ namespace BassClefStudio.NeuralNet.Core.IO
         }
     }
 
-    internal class SampleSetFromJsonConverter : IFromJsonConverter<SampleSet>
+    internal class SampleSetFromJsonConverter : IFromJsonConverter<NodeSet>
     {
-        public IFromJsonConverter<SampleData> SampleDataConverter { get; set; }
+        public IFromJsonConverter<Node> SampleDataConverter { get; set; }
 
         public bool CanConvert(JToken item) => item.IsJsonType("SampleSet");
 
-        public SampleSet Convert(JToken item)
+        public NodeSet Convert(JToken item)
         {
             bool isShuffled = item["IsShuffled"].Value<bool>();
-            SampleData[] data = item["Data"].Select(d => SampleDataConverter.GetTo(d)).ToArray();
-            return new SampleSet(data, isShuffled);
+            Node[] data = item["Data"].Select(d => SampleDataConverter.GetTo(d)).ToArray();
+            return new NodeSet(data, isShuffled);
         }
     }
 }
