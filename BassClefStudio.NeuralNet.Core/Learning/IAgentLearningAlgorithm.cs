@@ -1,4 +1,5 @@
-﻿using System;
+﻿using BassClefStudio.NeuralNet.Core.Networks;
+using System;
 using System.Collections.Generic;
 using System.Text;
 

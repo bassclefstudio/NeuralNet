@@ -3,9 +3,10 @@ using Medallion;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text;
 
-namespace BassClefStudio.NeuralNet.Core
+namespace BassClefStudio.NeuralNet.Core.Networks
 {
     /// <summary>
     /// Represents a basic neural network with weights, biases, and layers that can evaluate an array of <see cref="double"/> inputs and return an array of <see cref="double"/> outputs (see <seealso cref="FeedForward(double[])"/>).
@@ -17,22 +18,27 @@ namespace BassClefStudio.NeuralNet.Core
         /// <summary>
         /// An array of layer sizes, indicating the number of neurons per layer.
         /// </summary>
-        public int[] Layers { get; private set; }
+        public int[] LayerSizes { get => Layers.Select(l => l.Size).ToArray(); }
         
         /// <summary>
         /// A two-dimensional array of neuron activation values, with indexes [LayerId, NeuronId].
         /// </summary>
-        public double[][] Neurons { get; private set; }
+        public double[][] Neurons { get => Layers.Select(l => l.Neurons.Select(n => n.Activation).ToArray()).ToArray(); }
 
         /// <summary>
         /// A two-dimensional array of neuron bias values, with indexes [LayerId, NeuronId].
         /// </summary>
-        public double[][] Biases { get; private set; }
+        public double[][] Biases { get => Layers.Select(l => l.Neurons.Select(n => n.Bias).ToArray()).ToArray(); }
 
         /// <summary>
         /// A three-dimensional array of neuron connection weights, with indexes [LayerId, NeuronId, ConnectionId].
         /// </summary>
-        public double[][][] Weights { get; private set; }
+        public double[][][] Weights { get => Layers.Skip(1).Select(l => l.Neurons.Select(n => n.Synapses.Select(s => s.Weight).ToArray()).ToArray()).ToArray(); }
+
+        /// <summary>
+        /// An array of the <see cref="Layer"/>s that make up the structure of the <see cref="NeuralNetwork"/>.
+        /// </summary>
+        public Layer[] Layers { get; private set; }
 
         #endregion
         #region Initialize
@@ -45,9 +51,8 @@ namespace BassClefStudio.NeuralNet.Core
         /// <param name="randMax">The maximum random value for a weight or bias.</param>
         public NeuralNetwork(int[] layers, double randMin = -1, double randMax = 1)
         {
-            Layers = layers;
-
-            InitNeurons();
+            Layers = new Layer[layers.Length];
+            InitNeurons(layers);
             InitBiases(randMin, randMax);
             InitWeights(randMin, randMax);
         }
@@ -93,64 +98,77 @@ namespace BassClefStudio.NeuralNet.Core
                 }
             }
 
-            Layers = layers;
-
-            InitNeurons();
-            Biases = biases;
-            Weights = weights;
+            Layers = new Layer[layers.Length];
+            InitNeurons(layers);
+            InitBiases(biases);
+            InitWeights(weights);
         }
 
         //create empty storage array for the neurons in the network.
-        private void InitNeurons()
+        private void InitNeurons(int[] layers)
         {
-            List<double[]> neuronsList = new List<double[]>();
+            Layers = new Layer[layers.Length];
             for (int i = 0; i < Layers.Length; i++)
             {
-                neuronsList.Add(new double[Layers[i]]);
+                //new Neuron[layers[i]]
+                Layers[i] = new Layer(
+                    Enumerable.Range(0, layers[i])
+                    .Select(r => new Neuron()).ToArray());
             }
-            Neurons = neuronsList.ToArray();
         }
 
         //initializes and populates array for the biases being held within the network.
         private void InitBiases(double randMin, double randMax)
         {
-            var random = new Random();
+            foreach (var n in Layers.SelectMany(l => l.Neurons))
+            {
+                n.Bias = Rand.Current.NextDouble(randMin, randMax);
+            }
+        }
 
-            List<double[]> biasList = new List<double[]>();
+        private void InitBiases(double[][] biases)
+        {
             for (int i = 0; i < Layers.Length; i++)
             {
-                double[] bias = new double[Layers[i]];
-                for (int j = 0; j < Layers[i]; j++)
+                for (int j = 0; j < Layers[i].Neurons.Length; j++)
                 {
-                    bias[j] = Rand.Current.NextDouble(randMin, randMax);
+                    Layers[i].Neurons[j].Bias = biases[i][j];
                 }
-                biasList.Add(bias);
             }
-            Biases = biasList.ToArray();
         }
 
         //initializes random array for the weights being held in the network.
         private void InitWeights(double randMin, double randMax)
         {
-            var random = new Random();
-
-            List<double[][]> weightsList = new List<double[][]>();
             for (int i = 1; i < Layers.Length; i++)
             {
-                List<double[]> layerWeightsList = new List<double[]>();
-                int neuronsInPreviousLayer = Layers[i - 1];
-                for (int j = 0; j < Neurons[i].Length; j++)
+                foreach(var n in Layers[i].Neurons)
                 {
-                    double[] neuronWeights = new double[neuronsInPreviousLayer];
-                    for (int k = 0; k < neuronsInPreviousLayer; k++)
-                    {
-                        neuronWeights[k] = Rand.Current.NextDouble(randMin, randMax);
-                    }
-                    layerWeightsList.Add(neuronWeights);
+                    n.Synapses =
+                        Enumerable.Range(0, Layers[i - 1].Neurons.Length)
+                        .Select(r => new Synapse(
+                            Rand.Current.NextDouble(randMin, randMax))).ToArray();
                 }
-                weightsList.Add(layerWeightsList.ToArray());
             }
-            Weights = weightsList.ToArray();
+        }
+
+        private void InitWeights(double[][][] weights)
+        {
+            for (int i = 1; i < Layers.Length; i++)
+            {
+                for (int j = 0; j < Layers[i].Neurons.Length; j++)
+                {
+                    if (Layers[i].Neurons[j].Synapses == null)
+                    {
+                        Layers[i].Neurons[j].Synapses = new Synapse[weights[i - 1][j].Length];
+                    }
+
+                    for (int k = 0; k < Layers[i].Neurons[j].Synapses.Length; k++)
+                    {
+                        Layers[i].Neurons[j].Synapses[k] = new Synapse(weights[i - 1][j][k]);
+                    }
+                }
+            }
         }
 
         #endregion
@@ -183,18 +201,19 @@ namespace BassClefStudio.NeuralNet.Core
         {
             for (int i = 0; i < inputs.Length; i++)
             {
-                Neurons[0][i] = inputs[i];
+                Layers[0][i].Activation = inputs[i];
             }
             for (int i = 1; i < Layers.Length; i++)
             {
-                for (int j = 0; j < Neurons[i].Length; j++)
+                for (int j = 0; j < Layers[i].Size; j++)
                 {
                     double value = 0f;
-                    for (int k = 0; k < Neurons[i - 1].Length; k++)
+                    for (int k = 0; k < Layers[i - 1].Size; k++)
                     {
-                        value += Weights[i - 1][j][k] * Neurons[i - 1][k];
+                        //// Previous: Layers[i - 1][j]
+                        value += Layers[i][j].Synapses[k].Weight * Layers[i - 1][k].Activation;
                     }
-                    Neurons[i][j] = Activate(value + Biases[i][j]);
+                    Layers[i][j].Activation = Activate(value + Biases[i][j]);
                 }
             }
             return Neurons[Neurons.Length - 1];
@@ -206,7 +225,7 @@ namespace BassClefStudio.NeuralNet.Core
         /// <inheritdoc/>
         public static bool operator ==(NeuralNetwork a, NeuralNetwork b)
         {
-            return a.Layers.SequenceEqual(b.Layers) 
+            return a.LayerSizes.SequenceEqual(b.LayerSizes) 
                 && ArrayExtensions.AreEqual(a.Biases, b.Biases, (a2, b2) => ArrayExtensions.AreEqual(a2, b2)) 
                 && ArrayExtensions.AreEqual(a.Weights, b.Weights, (a2, b2) => ArrayExtensions.AreEqual(a2, b2, (a3, b3) => ArrayExtensions.AreEqual(a3, b3)));
         }

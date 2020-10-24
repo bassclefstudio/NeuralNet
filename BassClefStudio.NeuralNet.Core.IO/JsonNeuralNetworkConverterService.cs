@@ -1,4 +1,5 @@
 ﻿using Autofac;
+using BassClefStudio.NeuralNet.Core.Networks;
 using BassClefStudio.Serialization;
 using BassClefStudio.Serialization.DI;
 using BassClefStudio.Serialization.Json;
