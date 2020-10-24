@@ -59,13 +59,15 @@ namespace BassClefStudio.NeuralNet.Core.Learning.Backpropagation
 
             int layer = network.Layers.Length - 2;
             //// Calculates w' and b' for the last layer in the network.
-            for (int i = 0; i < network.Layers[network.Layers.Length - 1].Size; i++)
+            for (int i = 0; i < network.Layers[layer + 1].Size; i++)
             {
                 //// Previous: layer
-                network.Layers[layer + 1][i].Bias -= gamma[network.Layers.Length - 1][i] * LearningRate;
+                network.Layers[layer + 1][i].Bias -= gamma[layer + 1][i] * LearningRate;
                 for (int j = 0; j < network.Layers[layer].Size; j++)
                 {
-                    network.Layers[layer][i].Synapses[j].Weight -= gamma[network.Layers.Length - 1][i] * network.Layers[layer][j].Activation * LearningRate;
+                    //// Previous: network.Layers[layer][i]...
+                    network.Layers[layer + 1][i].Synapses[j].Weight -= gamma[layer + 1][i] * network.Layers[layer][j].Activation * LearningRate;
+
                     //// Randomness:
                     if (Randomness != 0)
                     {
@@ -84,7 +86,8 @@ namespace BassClefStudio.NeuralNet.Core.Learning.Backpropagation
                     gamma[i][j] = 0;
                     for (int k = 0; k < gamma[i + 1].Length; k++)
                     {
-                        gamma[i][j] = gamma[i + 1][k] * network.Layers[i][k].Synapses[j].Weight;
+                        //// Previous: ...network.Layers[i][k]...
+                        gamma[i][j] = gamma[i + 1][k] * network.Layers[i + 1][k].Synapses[j].Weight;
                     }
                     //// Calculate resulting gamma.
                     gamma[i][j] *= network.ActivateDer(network.Neurons[i][j]);
@@ -107,7 +110,8 @@ namespace BassClefStudio.NeuralNet.Core.Learning.Backpropagation
                     for (int k = 0; k < network.Layers[layer].Size; k++)
                     {
                         //// Change weights by -gamma.
-                        network.Layers[layer][j].Synapses[k].Weight -= gamma[i][j] * network.Layers[i - 1][k].Activation * LearningRate;
+                        //// Previous: network.Layers[layer][j]...
+                        network.Layers[layer + 1][j].Synapses[k].Weight -= gamma[i][j] * network.Layers[i - 1][k].Activation * LearningRate;
 
                         //// Randomness:
                         if (Randomness != 0)

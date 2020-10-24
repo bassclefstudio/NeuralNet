@@ -18,7 +18,7 @@ namespace BassClefStudio.NeuralNet.Core.Networks
         /// <summary>
         /// An array of layer sizes, indicating the number of neurons per layer.
         /// </summary>
-        public int[] LayerSizes { get => Layers.Select(l => l.Neurons.Length).ToArray(); }
+        public int[] LayerSizes { get => Layers.Select(l => l.Size).ToArray(); }
         
         /// <summary>
         /// A two-dimensional array of neuron activation values, with indexes [LayerId, NeuronId].
@@ -201,18 +201,19 @@ namespace BassClefStudio.NeuralNet.Core.Networks
         {
             for (int i = 0; i < inputs.Length; i++)
             {
-                Neurons[0][i] = inputs[i];
+                Layers[0][i].Activation = inputs[i];
             }
-            for (int i = 1; i < LayerSizes.Length; i++)
+            for (int i = 1; i < Layers.Length; i++)
             {
-                for (int j = 0; j < Neurons[i].Length; j++)
+                for (int j = 0; j < Layers[i].Size; j++)
                 {
                     double value = 0f;
-                    for (int k = 0; k < Neurons[i - 1].Length; k++)
+                    for (int k = 0; k < Layers[i - 1].Size; k++)
                     {
-                        value += Weights[i - 1][j][k] * Neurons[i - 1][k];
+                        //// Previous: Layers[i - 1][j]
+                        value += Layers[i][j].Synapses[k].Weight * Layers[i - 1][k].Activation;
                     }
-                    Neurons[i][j] = Activate(value + Biases[i][j]);
+                    Layers[i][j].Activation = Activate(value + Biases[i][j]);
                 }
             }
             return Neurons[Neurons.Length - 1];
