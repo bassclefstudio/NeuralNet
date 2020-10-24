@@ -8,15 +8,14 @@ namespace BassClefStudio.NeuralNet.Core.Networks
 {
     public class Neuron
     {
-        public DoubleStore Activation { get; set; }
+        public double Activation { get; set; }
 
-        public DoubleStore Bias { get; set; }
+        public double Bias { get; set; }
 
         public Synapse[] Synapses { get; set; }
 
-        public Neuron(double activation)
+        public Neuron()
         {
-            Activation = (DoubleStore)activation;
         }
     }
 }

@@ -7,11 +7,11 @@ namespace BassClefStudio.NeuralNet.Core.Networks
 {
     public class Synapse
     {
-        public DoubleStore Weight { get; set; }
+        public double Weight { get; set; }
 
         public Synapse(double weight)
         {
-            Weight = (DoubleStore)weight;
+            Weight = weight;
         }
     }
 }

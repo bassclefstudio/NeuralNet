@@ -3,6 +3,7 @@ using Medallion;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text;
 
 namespace BassClefStudio.NeuralNet.Core.Networks
@@ -17,86 +18,22 @@ namespace BassClefStudio.NeuralNet.Core.Networks
         /// <summary>
         /// An array of layer sizes, indicating the number of neurons per layer.
         /// </summary>
-        public int[] Layers 
-        { 
-            get => ModelLayers.Select(l => l.Neurons.Length).ToArray(); 
-            private set
-            {
-                for (int i = 0; i < ModelLayers.Length; i++)
-                {
-                    if (ModelLayers[i] == null)
-                    {
-                        ModelLayers[i] = new Layer(new Neuron[value[i]]);
-                    }
-                    else
-                    {
-                        ModelLayers[i].Neurons = new Neuron[value[i]];
-                    }
-                }
-            }
-        }
+        public int[] Layers { get => ModelLayers.Select(l => l.Neurons.Length).ToArray(); }
         
         /// <summary>
         /// A two-dimensional array of neuron activation values, with indexes [LayerId, NeuronId].
         /// </summary>
-        public DoubleStore[][] Neurons 
-        {
-            get => ModelLayers.Select(l => l.Neurons.Select(n => n.Activation).ToArray()).ToArray(); 
-            private set
-            {
-                for (int i = 0; i < ModelLayers.Length; i++)
-                {
-                    for (int j = 0; j < ModelLayers[i].Neurons.Length; j++)
-                    {
-                        ModelLayers[i].Neurons[j] = new Neuron(value[i][j]);
-                    }
-                }
-            }
-        }
+        public double[][] Neurons { get => ModelLayers.Select(l => l.Neurons.Select(n => n.Activation).ToArray()).ToArray(); }
 
         /// <summary>
         /// A two-dimensional array of neuron bias values, with indexes [LayerId, NeuronId].
         /// </summary>
-        public DoubleStore[][] Biases
-        {
-            get => ModelLayers.Select(l => l.Neurons.Select(n => n.Bias).ToArray()).ToArray();
-            private set
-            {
-                for (int i = 0; i < ModelLayers.Length; i++)
-                {
-                    for (int j = 0; j < ModelLayers[i].Neurons.Length; j++)
-                    {
-                        ModelLayers[i].Neurons[j].Bias = value[i][j];
-                    }
-                }
-            }
-        }
+        public double[][] Biases { get => ModelLayers.Select(l => l.Neurons.Select(n => n.Bias).ToArray()).ToArray(); }
 
         /// <summary>
         /// A three-dimensional array of neuron connection weights, with indexes [LayerId, NeuronId, ConnectionId].
         /// </summary>
-        public DoubleStore[][][] Weights
-        {
-            get => ModelLayers.Skip(1).Select(l => l.Neurons.Select(n => n.Synapses.Select(s => s.Weight).ToArray()).ToArray()).ToArray();
-            private set
-            {
-                for (int i = 1; i < ModelLayers.Length; i++)
-                {
-                    for (int j = 0; j < ModelLayers[i].Neurons.Length; j++)
-                    {
-                        if(ModelLayers[i].Neurons[j].Synapses == null)
-                        {
-                            ModelLayers[i].Neurons[j].Synapses = new Synapse[value[i - 1][j].Length];
-                        }
-
-                        for (int k = 0; k < ModelLayers[i].Neurons[j].Synapses.Length; k++)
-                        {
-                            ModelLayers[i].Neurons[j].Synapses[k] = new Synapse(value[i - 1][j][k]);
-                        }
-                    }
-                }
-            }
-        }
+        public double[][][] Weights { get => ModelLayers.Skip(1).Select(l => l.Neurons.Select(n => n.Synapses.Select(s => s.Weight).ToArray()).ToArray()).ToArray(); }
 
         /// <summary>
         /// An array of the <see cref="Layer"/>s that make up the structure of the <see cref="NeuralNetwork"/>.
@@ -115,8 +52,7 @@ namespace BassClefStudio.NeuralNet.Core.Networks
         public NeuralNetwork(int[] layers, double randMin = -1, double randMax = 1)
         {
             ModelLayers = new Layer[layers.Length];
-            Layers = layers;
-            InitNeurons();
+            InitNeurons(layers);
             InitBiases(randMin, randMax);
             InitWeights(randMin, randMax);
         }
@@ -163,63 +99,76 @@ namespace BassClefStudio.NeuralNet.Core.Networks
             }
 
             ModelLayers = new Layer[layers.Length];
-            Layers = layers;
-            InitNeurons();
-            Biases = biases;
-            Weights = weights;
+            InitNeurons(layers);
+            InitBiases(biases);
+            InitWeights(weights);
         }
 
         //create empty storage array for the neurons in the network.
-        private void InitNeurons()
+        private void InitNeurons(int[] layers)
         {
-            List<double[]> neuronsList = new List<double[]>();
-            for (int i = 0; i < Layers.Length; i++)
+            ModelLayers = new Layer[layers.Length];
+            for (int i = 0; i < ModelLayers.Length; i++)
             {
-                neuronsList.Add(new double[Layers[i]]);
+                //new Neuron[layers[i]]
+                ModelLayers[i] = new Layer(
+                    Enumerable.Range(0, layers[i])
+                    .Select(r => new Neuron()).ToArray());
             }
-            Neurons = neuronsList.ToArray();
         }
 
         //initializes and populates array for the biases being held within the network.
         private void InitBiases(double randMin, double randMax)
         {
-            var random = new Random();
-
-            List<double[]> biasList = new List<double[]>();
-            for (int i = 0; i < Layers.Length; i++)
+            foreach (var n in ModelLayers.SelectMany(l => l.Neurons))
             {
-                double[] bias = new double[Layers[i]];
-                for (int j = 0; j < Layers[i]; j++)
-                {
-                    bias[j] = Rand.Current.NextDouble(randMin, randMax);
-                }
-                biasList.Add(bias);
+                n.Bias = Rand.Current.NextDouble(randMin, randMax);
             }
-            Biases = biasList.ToArray();
+        }
+
+        private void InitBiases(double[][] biases)
+        {
+            for (int i = 0; i < ModelLayers.Length; i++)
+            {
+                for (int j = 0; j < ModelLayers[i].Neurons.Length; j++)
+                {
+                    ModelLayers[i].Neurons[j].Bias = biases[i][j];
+                }
+            }
         }
 
         //initializes random array for the weights being held in the network.
         private void InitWeights(double randMin, double randMax)
         {
-            var random = new Random();
-
-            List<double[][]> weightsList = new List<double[][]>();
-            for (int i = 1; i < Layers.Length; i++)
+            for (int i = 1; i < ModelLayers.Length; i++)
             {
-                List<double[]> layerWeightsList = new List<double[]>();
-                int neuronsInPreviousLayer = Layers[i - 1];
-                for (int j = 0; j < Neurons[i].Length; j++)
+                foreach(var n in ModelLayers[i].Neurons)
                 {
-                    double[] neuronWeights = new double[neuronsInPreviousLayer];
-                    for (int k = 0; k < neuronsInPreviousLayer; k++)
-                    {
-                        neuronWeights[k] = Rand.Current.NextDouble(randMin, randMax);
-                    }
-                    layerWeightsList.Add(neuronWeights);
+                    n.Synapses =
+                        Enumerable.Range(0, ModelLayers[i - 1].Neurons.Length)
+                        .Select(r => new Synapse(
+                            Rand.Current.NextDouble(randMin, randMax))).ToArray();
                 }
-                weightsList.Add(layerWeightsList.ToArray());
             }
-            Weights = weightsList.ToArray();
+        }
+
+        private void InitWeights(double[][][] weights)
+        {
+            for (int i = 1; i < ModelLayers.Length; i++)
+            {
+                for (int j = 0; j < ModelLayers[i].Neurons.Length; j++)
+                {
+                    if (ModelLayers[i].Neurons[j].Synapses == null)
+                    {
+                        ModelLayers[i].Neurons[j].Synapses = new Synapse[weights[i - 1][j].Length];
+                    }
+
+                    for (int k = 0; k < ModelLayers[i].Neurons[j].Synapses.Length; k++)
+                    {
+                        ModelLayers[i].Neurons[j].Synapses[k] = new Synapse(weights[i - 1][j][k]);
+                    }
+                }
+            }
         }
 
         #endregion
