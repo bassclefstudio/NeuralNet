@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace BassClefStudio.NeuralNet.Core
+namespace BassClefStudio.NeuralNet.Core.Networks
 {
     /// <summary>
     /// Represents a basic neural network with weights, biases, and layers that can evaluate an array of <see cref="double"/> inputs and return an array of <see cref="double"/> outputs (see <seealso cref="FeedForward(double[])"/>).
