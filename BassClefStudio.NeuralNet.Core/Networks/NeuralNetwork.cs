@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace BassClefStudio.NeuralNet.Core.Networks
 {
@@ -205,7 +206,7 @@ namespace BassClefStudio.NeuralNet.Core.Networks
             }
             for (int i = 1; i < Layers.Length; i++)
             {
-                for (int j = 0; j < Layers[i].Size; j++)
+                Parallel.For(0, Layers[i].Size, j =>
                 {
                     double value = 0f;
                     for (int k = 0; k < Layers[i - 1].Size; k++)
@@ -214,9 +215,9 @@ namespace BassClefStudio.NeuralNet.Core.Networks
                         value += Layers[i][j].Synapses[k].Weight * Layers[i - 1][k].Activation;
                     }
                     Layers[i][j].Activation = Activate(value + Biases[i][j]);
-                }
+                });
             }
-            return Neurons[Neurons.Length - 1];
+            return Layers[Neurons.Length - 1].Neurons.Select(n => n.Activation).ToArray();
         }
 
         #endregion
