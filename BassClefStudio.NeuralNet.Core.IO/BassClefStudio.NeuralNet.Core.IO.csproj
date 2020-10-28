@@ -3,7 +3,7 @@
   <PropertyGroup>
     <TargetFramework>netstandard1.4</TargetFramework>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
-    <Version>0.1.0</Version>
+    <Version>0.2.0</Version>
     <Authors>BassClefStudio</Authors>
     <Description>File serialization services for BassClefStudio.NeuralNet.Core.</Description>
     <PackageProjectUrl>https://github.com/bassclefstudio/NeuralNet</PackageProjectUrl>

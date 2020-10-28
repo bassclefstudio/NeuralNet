@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace BassClefStudio.NeuralNet.Core.Networks
 {
@@ -16,22 +17,22 @@ namespace BassClefStudio.NeuralNet.Core.Networks
         #region Properties
 
         /// <summary>
-        /// An array of layer sizes, indicating the number of neurons per layer.
+        /// A read-only array of layer sizes, indicating the number of neurons per layer.
         /// </summary>
         public int[] LayerSizes { get => Layers.Select(l => l.Size).ToArray(); }
-        
+
         /// <summary>
-        /// A two-dimensional array of neuron activation values, with indexes [LayerId, NeuronId].
+        /// A read-only two-dimensional array of neuron activation values, with indexes [LayerId, NeuronId].
         /// </summary>
         public double[][] Neurons { get => Layers.Select(l => l.Neurons.Select(n => n.Activation).ToArray()).ToArray(); }
 
         /// <summary>
-        /// A two-dimensional array of neuron bias values, with indexes [LayerId, NeuronId].
+        /// A read-only two-dimensional array of neuron bias values, with indexes [LayerId, NeuronId].
         /// </summary>
         public double[][] Biases { get => Layers.Select(l => l.Neurons.Select(n => n.Bias).ToArray()).ToArray(); }
 
         /// <summary>
-        /// A three-dimensional array of neuron connection weights, with indexes [LayerId, NeuronId, ConnectionId].
+        /// A read-only three-dimensional array of neuron connection weights, with indexes [LayerId, NeuronId, ConnectionId].
         /// </summary>
         public double[][][] Weights { get => Layers.Skip(1).Select(l => l.Neurons.Select(n => n.Synapses.Select(s => s.Weight).ToArray()).ToArray()).ToArray(); }
 
@@ -197,7 +198,8 @@ namespace BassClefStudio.NeuralNet.Core.Networks
         /// Feeds an array of <see cref="double"/> inputs into the <see cref="NeuralNetwork"/> and retuns an array of <see cref="double"/> outputs.
         /// </summary>
         /// <param name="inputs">The collection of <see cref="double"/> values fed into the first layer of the <see cref="NeuralNetwork"/>.</param>
-        public double[] FeedForward(double[] inputs)
+        /// <param name="runParallel">Opts to evaluate a layer of <see cref="Neuron"/>s' activations in parallel. May be good for performance with large <see cref="Layer.Size"/>s.</param>
+        public double[] FeedForward(double[] inputs, bool runParallel = false)
         {
             for (int i = 0; i < inputs.Length; i++)
             {
@@ -205,18 +207,34 @@ namespace BassClefStudio.NeuralNet.Core.Networks
             }
             for (int i = 1; i < Layers.Length; i++)
             {
-                for (int j = 0; j < Layers[i].Size; j++)
+                if (runParallel)
                 {
-                    double value = 0f;
-                    for (int k = 0; k < Layers[i - 1].Size; k++)
+                    Parallel.For(0, Layers[i].Size, j =>
                     {
-                        //// Previous: Layers[i - 1][j]
-                        value += Layers[i][j].Synapses[k].Weight * Layers[i - 1][k].Activation;
+                        double value = 0f;
+                        for (int k = 0; k < Layers[i - 1].Size; k++)
+                        {
+                            //// Previous: Layers[i - 1][j]
+                            value += Layers[i][j].Synapses[k].Weight * Layers[i - 1][k].Activation;
+                        }
+                        Layers[i][j].Activation = Activate(value + Biases[i][j]);
+                    });
+                }
+                else
+                {
+                    for (int j = 0; j < Layers[i].Size; j++)
+                    {
+                        double value = 0f;
+                        for (int k = 0; k < Layers[i - 1].Size; k++)
+                        {
+                            //// Previous: Layers[i - 1][j]
+                            value += Layers[i][j].Synapses[k].Weight * Layers[i - 1][k].Activation;
+                        }
+                        Layers[i][j].Activation = Activate(value + Biases[i][j]);
                     }
-                    Layers[i][j].Activation = Activate(value + Biases[i][j]);
                 }
             }
-            return Neurons[Neurons.Length - 1];
+            return Layers[Neurons.Length - 1].Neurons.Select(n => n.Activation).ToArray();
         }
 
         #endregion

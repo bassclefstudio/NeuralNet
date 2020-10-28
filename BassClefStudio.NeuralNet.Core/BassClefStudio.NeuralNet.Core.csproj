@@ -4,7 +4,7 @@
     <TargetFramework>netstandard1.4</TargetFramework>
     <Platforms>AnyCPU;x64</Platforms>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
-    <Version>0.1.0</Version>
+    <Version>0.2.0</Version>
     <Authors>BassClefStudio</Authors>
     <Description>Purely educational backpropagated neural network library. Not for production use.</Description>
     <PackageProjectUrl>https://github.com/bassclefstudio/NeuralNet</PackageProjectUrl>
@@ -12,7 +12,9 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="BassClefStudio.NET.Core" Version="1.4.0" />
     <PackageReference Include="MedallionRandom" Version="1.1.0" />
+    <PackageReference Include="System.Threading.Tasks.Parallel" Version="4.3.0" />
   </ItemGroup>
 
 </Project>
