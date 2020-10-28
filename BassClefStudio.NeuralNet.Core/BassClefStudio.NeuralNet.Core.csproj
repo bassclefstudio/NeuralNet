@@ -12,7 +12,9 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="BassClefStudio.NET.Core" Version="1.4.0" />
     <PackageReference Include="MedallionRandom" Version="1.1.0" />
+    <PackageReference Include="System.Threading.Tasks.Parallel" Version="4.3.0" />
   </ItemGroup>
 
 </Project>

@@ -18,7 +18,7 @@ namespace BassClefStudio.NeuralNet.Core.Learning
         /// <summary>
         /// Represents the <see cref="NeuralNetwork"/> that is the 'brain' of the <see cref="IAgent"/> and manipulates the environment.
         /// </summary>
-        NeuralNetwork Network { get; }
+        NeuralNetwork Network { get; set; }
 
         /// <summary>
         /// Executes the actions of the <see cref="IAgent"/> using the current <see cref="Network"/> to interpret the given <see cref="Inputs"/>.
@@ -40,7 +40,7 @@ namespace BassClefStudio.NeuralNet.Core.Learning
         public Node Inputs { get; private set; }
 
         /// <inheritdoc/>
-        public NeuralNetwork Network { get; }
+        public NeuralNetwork Network { get; set; }
 
         /// <inheritdoc/>
         public void Execute()

@@ -16,22 +16,22 @@ namespace BassClefStudio.NeuralNet.Core.Networks
         #region Properties
 
         /// <summary>
-        /// An array of layer sizes, indicating the number of neurons per layer.
+        /// A read-only array of layer sizes, indicating the number of neurons per layer.
         /// </summary>
         public int[] LayerSizes { get => Layers.Select(l => l.Size).ToArray(); }
-        
+
         /// <summary>
-        /// A two-dimensional array of neuron activation values, with indexes [LayerId, NeuronId].
+        /// A read-only two-dimensional array of neuron activation values, with indexes [LayerId, NeuronId].
         /// </summary>
         public double[][] Neurons { get => Layers.Select(l => l.Neurons.Select(n => n.Activation).ToArray()).ToArray(); }
 
         /// <summary>
-        /// A two-dimensional array of neuron bias values, with indexes [LayerId, NeuronId].
+        /// A read-only two-dimensional array of neuron bias values, with indexes [LayerId, NeuronId].
         /// </summary>
         public double[][] Biases { get => Layers.Select(l => l.Neurons.Select(n => n.Bias).ToArray()).ToArray(); }
 
         /// <summary>
-        /// A three-dimensional array of neuron connection weights, with indexes [LayerId, NeuronId, ConnectionId].
+        /// A read-only three-dimensional array of neuron connection weights, with indexes [LayerId, NeuronId, ConnectionId].
         /// </summary>
         public double[][][] Weights { get => Layers.Skip(1).Select(l => l.Neurons.Select(n => n.Synapses.Select(s => s.Weight).ToArray()).ToArray()).ToArray(); }
 

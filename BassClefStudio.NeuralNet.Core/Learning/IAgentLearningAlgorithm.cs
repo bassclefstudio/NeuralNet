@@ -14,7 +14,6 @@ namespace BassClefStudio.NeuralNet.Core.Learning
         /// Uses the <see cref="IAgent"/>s produced by an <see cref="IAgentEnvironment"/> to teach a <see cref="NeuralNetwork"/> with the goal of increasing the <see cref="IAgent.GetFitness"/> of resulting <see cref="IAgent"/>s.
         /// </summary>
         /// <param name="environment">The <see cref="IAgentEnvironment"/> containing the <see cref="IAgent"/>s to train.</param>
-        /// <param name="numberOfExecutes">The maximum number of times to call <see cref="IAgent.Execute"/> before evaluating the <see cref="IAgent.GetFitness"/> and adjusting network parameters.</param>
-        double Teach(IAgentEnvironment environment, int numberOfExecutes);
+        double Teach(IAgentEnvironment environment);
     }
 }
