@@ -4,7 +4,7 @@
     <TargetFramework>netstandard1.4</TargetFramework>
     <Platforms>AnyCPU;x64</Platforms>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
-    <Version>0.1.0</Version>
+    <Version>0.2.0</Version>
     <Authors>BassClefStudio</Authors>
     <Description>Purely educational backpropagated neural network library. Not for production use.</Description>
     <PackageProjectUrl>https://github.com/bassclefstudio/NeuralNet</PackageProjectUrl>
