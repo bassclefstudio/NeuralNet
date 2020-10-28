@@ -18,7 +18,7 @@ namespace BassClefStudio.NeuralNet.Core.Learning.Evolution
         /// <summary>
         /// The number of <see cref="IAgentEnvironment"/>s competing in each execution of <see cref="Teach(IAgentEnvironment)"/>.
         /// </summary>
-        public int Environments { get; }
+        public int GenerationSize { get; }
 
         /// <summary>
         /// The maximum number of times to call <see cref="IAgent.Execute"/> before evaluating <see cref="IAgent.GetFitness"/> and adjusting network parameters.
@@ -33,12 +33,12 @@ namespace BassClefStudio.NeuralNet.Core.Learning.Evolution
         /// <summary>
         /// Creates a new <see cref="EvolutionaryLearningAlgorithm"/>.
         /// </summary>
-        /// <param name="environments">The number of <see cref="IAgentEnvironment"/>s competing in each execution of <see cref="Teach(IAgentEnvironment)"/>.</param>
+        /// <param name="generationSize">The number of <see cref="IAgentEnvironment"/>s competing in each execution of <see cref="Teach(IAgentEnvironment)"/>.</param>
         /// <param name="numberOfExecutes">The maximum number of times to call <see cref="IAgent.Execute"/> before evaluating <see cref="IAgent.GetFitness"/> and adjusting network parameters.</param>
         /// <param name="mutationLevel">The upper bound of the random changes ('mutations') to the weights and biases of <see cref="IAgent"/>s' <see cref="NeuralNetwork"/>s.</param>
-        public EvolutionaryLearningAlgorithm(int environments, int numberOfExecutes, double mutationLevel)
+        public EvolutionaryLearningAlgorithm(int generationSize, int numberOfExecutes, double mutationLevel)
         {
-            Environments = environments;
+            GenerationSize = generationSize;
             NumberOfExecutes = numberOfExecutes;
             MutationLevel = mutationLevel;
         }
@@ -47,7 +47,7 @@ namespace BassClefStudio.NeuralNet.Core.Learning.Evolution
         public double Teach(IAgentEnvironment environment)
         {
             //// Create the specified number of environments.
-            IAgentEnvironment[] eList = Enumerable.Range(0, Environments).Select(i => environment.Copy()).ToArray();
+            IAgentEnvironment[] eList = Enumerable.Range(0, GenerationSize).Select(i => environment.Copy()).ToArray();
             Parallel.ForEach(eList, e =>
             {
                 Mutate(e);
