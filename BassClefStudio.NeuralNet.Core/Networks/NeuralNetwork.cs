@@ -198,8 +198,7 @@ namespace BassClefStudio.NeuralNet.Core.Networks
         /// Feeds an array of <see cref="double"/> inputs into the <see cref="NeuralNetwork"/> and retuns an array of <see cref="double"/> outputs.
         /// </summary>
         /// <param name="inputs">The collection of <see cref="double"/> values fed into the first layer of the <see cref="NeuralNetwork"/>.</param>
-        /// <param name="runParallel">Opts to evaluate a layer of <see cref="Neuron"/>s' activations in parallel. May be good for performance with large <see cref="Layer.Size"/>s.</param>
-        public double[] FeedForward(double[] inputs, bool runParallel = false)
+        public double[] FeedForward(double[] inputs)
         {
             for (int i = 0; i < inputs.Length; i++)
             {
@@ -207,31 +206,15 @@ namespace BassClefStudio.NeuralNet.Core.Networks
             }
             for (int i = 1; i < Layers.Length; i++)
             {
-                if (runParallel)
+                for (int j = 0; j < Layers[i].Size; j++)
                 {
-                    Parallel.For(0, Layers[i].Size, j =>
+                    double value = 0f;
+                    for (int k = 0; k < Layers[i - 1].Size; k++)
                     {
-                        double value = 0f;
-                        for (int k = 0; k < Layers[i - 1].Size; k++)
-                        {
-                            //// Previous: Layers[i - 1][j]
-                            value += Layers[i][j].Synapses[k].Weight * Layers[i - 1][k].Activation;
-                        }
-                        Layers[i][j].Activation = Activate(value + Biases[i][j]);
-                    });
-                }
-                else
-                {
-                    for (int j = 0; j < Layers[i].Size; j++)
-                    {
-                        double value = 0f;
-                        for (int k = 0; k < Layers[i - 1].Size; k++)
-                        {
-                            //// Previous: Layers[i - 1][j]
-                            value += Layers[i][j].Synapses[k].Weight * Layers[i - 1][k].Activation;
-                        }
-                        Layers[i][j].Activation = Activate(value + Biases[i][j]);
+                        //// Previous: Layers[i - 1][j]
+                        value += Layers[i][j].Synapses[k].Weight * Layers[i - 1][k].Activation;
                     }
+                    Layers[i][j].Activation = Activate(value + Biases[i][j]);
                 }
             }
             return Layers[Neurons.Length - 1].Neurons.Select(n => n.Activation).ToArray();
